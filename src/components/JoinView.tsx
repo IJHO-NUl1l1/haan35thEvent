@@ -17,7 +17,7 @@ const showMockTools = MOCK_TOOLS_ENABLED || process.env.NODE_ENV === "developmen
 // QR 을 찍고 들어오는 모바일 화면. 참여/불참 응답 → 결과 화면.
 export function JoinView() {
   const myStatus = useSyncExternalStore(subscribeMyStatus, getMyStatus, () => null);
-  const { stats, setStats, refresh } = useRsvpStats(5000);
+  const { stats, setStats } = useRsvpStats(5000);
   const [pending, setPending] = useState<RsvpStatus | null>(null);
   const [failed, setFailed] = useState(false);
   useCelebration(!!stats && stats.attend >= stats.goal);
@@ -94,7 +94,7 @@ export function JoinView() {
       </section>
 
       {/* 모바일에서는 고정 위치가 로고·버튼을 가려서 본문 아래에 둡니다. */}
-      {showMockTools && <MockControls onChange={refresh} className="mx-auto mt-6" />}
+      {showMockTools && <MockControls onChange={setStats} className="mx-auto mt-6" />}
     </main>
   );
 }

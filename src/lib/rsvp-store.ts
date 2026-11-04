@@ -67,6 +67,17 @@ export async function saveResponse(voterId: string, status: RsvpStatus) {
   mockResponses.set(voterId, status);
 }
 
+// MOCK 테스트용 가짜 참여자. 여러 명도 DB 요청 한 번으로 넣습니다.
+export async function addMockAttendees(count: number) {
+  const ids = Array.from({ length: count }, () => `mock-${crypto.randomUUID()}`);
+  if (supabase) {
+    const { error } = await supabase.from(TABLE).insert(ids.map((voter_id) => ({ voter_id, status: "attend" })));
+    if (error) throw error;
+    return;
+  }
+  ids.forEach((id) => mockResponses.set(id, "attend"));
+}
+
 export async function clearResponses() {
   if (supabase) {
     // delete 는 조건이 필요해서 모든 행에 맞는 조건을 둡니다.
