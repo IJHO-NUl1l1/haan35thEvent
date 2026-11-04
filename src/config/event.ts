@@ -23,5 +23,5 @@ export const EVENT = {
     ],
   },
   // 참여 인원이 이 숫자에 도달하면 축하 이펙트가 터집니다.
-  goal: { mock: true, value: 35 },
+  goal: { mock: false, value: 100 },
 } as const;

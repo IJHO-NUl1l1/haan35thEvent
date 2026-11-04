@@ -1,5 +1,5 @@
-// 오른쪽 눈금자. 목표의 25 / 50 / 75 / 100% 지점에 인원수를 표시합니다.
-const MARKS = [0.25, 0.5, 0.75, 1];
+// 오른쪽 눈금자. 목표의 25 / 50 / 100% 지점에 인원수를 표시합니다.
+const MARKS = [0.25, 0.5, 1];
 
 export function Scale({ goal, tone }: { goal: number; tone: "dark" | "light" }) {
   const line = tone === "dark" ? "bg-ink/25" : "bg-white/40";
