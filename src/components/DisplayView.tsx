@@ -14,7 +14,7 @@ const showMockTools = MOCK_TOOLS_ENABLED || process.env.NODE_ENV === "developmen
 
 // 행사장 스크린/PC 에 띄우는 화면. QR 과 실시간 참여 인원을 보여줍니다.
 export function DisplayView() {
-  const { stats, setStats } = useRsvpStats(3000);
+  const { stats, mutate } = useRsvpStats(3000);
   useCelebration(!!stats && stats.attend >= stats.goal);
 
   return (
@@ -63,7 +63,7 @@ export function DisplayView() {
         </div>
       </footer>
 
-      {showMockTools && <MockControls onChange={setStats} />}
+      {showMockTools && <MockControls mutate={mutate} />}
     </div>
   );
 }

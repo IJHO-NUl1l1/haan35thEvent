@@ -1,41 +1,40 @@
 "use client";
 
-import { useState } from "react";
+import type { MutateStats } from "@/hooks/useRsvpStats";
 import type { RsvpStats } from "@/lib/rsvp";
 import { MockBadge } from "./MockBadge";
 
+async function send(init: RequestInit): Promise<RsvpStats> {
+  const res = await fetch("/api/rsvp/mock", init);
+  if (!res.ok) throw new Error(`/api/rsvp/mock ${res.status}`);
+  return res.json();
+}
+
 // MOCK 테스트 도구: 가짜 참여자를 넣어 축하 이펙트를 확인할 때 사용. (표시 여부는 MOCK_TOOLS_ENABLED)
+// 누르는 즉시 숫자가 바뀌고, DB 저장은 뒤에서 처리됩니다.
 export function MockControls({
-  onChange,
+  mutate,
   className = "fixed left-1/2 top-3 -translate-x-1/2",
 }: {
-  onChange: (stats: RsvpStats) => void;
+  mutate: MutateStats;
   className?: string;
 }) {
-  const [busy, setBusy] = useState(false);
-
-  // 응답에 최신 집계가 들어 있어서, 다시 조회하지 않고 바로 화면에 반영합니다.
-  async function run(init: RequestInit) {
-    setBusy(true);
-    try {
-      const res = await fetch("/api/rsvp/mock", init);
-      if (res.ok) onChange(await res.json());
-    } finally {
-      setBusy(false);
-    }
-  }
-
   const addAttendees = (count: number) =>
-    run({ method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ count }) });
+    mutate(
+      (s) => ({ ...s, attend: s.attend + count }),
+      () => send({ method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ count }) }),
+    ).catch(() => {});
 
-  const button =
-    "rounded-md border border-line bg-white px-2.5 py-1.5 text-xs font-medium hover:bg-stone-50 disabled:opacity-50";
+  const reset = () =>
+    mutate((s) => ({ ...s, attend: 0, decline: 0 }), () => send({ method: "DELETE" })).catch(() => {});
+
+  const button = "rounded-md border border-line bg-white px-2.5 py-1.5 text-xs font-medium hover:bg-stone-50";
   return (
     <div className={`${className} flex items-center gap-2 rounded-lg border border-amber-300 bg-amber-50/95 p-2 shadow-sm`}>
       <MockBadge label="MOCK 테스트" />
-      <button className={button} disabled={busy} onClick={() => addAttendees(1)}>+1 참여</button>
-      <button className={button} disabled={busy} onClick={() => addAttendees(10)}>+10 참여</button>
-      <button className={button} disabled={busy} onClick={() => run({ method: "DELETE" })}>초기화</button>
+      <button className={button} onClick={() => addAttendees(1)}>+1 참여</button>
+      <button className={button} onClick={() => addAttendees(10)}>+10 참여</button>
+      <button className={button} onClick={reset}>초기화</button>
     </div>
   );
 }

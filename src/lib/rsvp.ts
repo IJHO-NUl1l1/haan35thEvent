@@ -16,6 +16,14 @@ export function isRsvpStatus(value: unknown): value is RsvpStatus {
   return value === "attend" || value === "decline";
 }
 
+// 응답이 from → to 로 바뀌었을 때의 집계. 서버 응답 전에 화면에 먼저 반영할 때 씁니다.
+export function shiftStats(stats: RsvpStats, from: RsvpStatus | null, to: RsvpStatus | null): RsvpStats {
+  const next = { ...stats };
+  if (from) next[from]--;
+  if (to) next[to]++;
+  return next;
+}
+
 export async function fetchStats(): Promise<RsvpStats> {
   const res = await fetch("/api/rsvp", { cache: "no-store" });
   if (!res.ok) throw new Error(`GET /api/rsvp ${res.status}`);
