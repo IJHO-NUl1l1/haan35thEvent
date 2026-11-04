@@ -44,7 +44,8 @@ export function ResultView() {
   const fill = Math.max(MIN_LEVEL, Math.min(1, attend / goal));
 
   // 물 높이: 스프링으로 살짝 넘쳤다가 자리를 잡아 출렁이는 느낌을 줍니다.
-  const level = useSpring(0, { stiffness: 30, damping: 8 });
+  // visualDuration 을 고정해서 +1 처럼 짧은 거리도 +10 과 같은 시간에 걸쳐 천천히 올라갑니다.
+  const level = useSpring(0, { visualDuration: 1.8, bounce: 0.2 });
   // 물결은 물 본체 위로 솟아 있어서(Waves 높이의 절반), 흰 글자 경계도 그만큼 올려 수면 평균선에 맞춥니다.
   const clipPath = useTransform(level, (v) => `inset(calc(${(1 - v) * 100}% - 24px) 0 0 0)`);
   const waveScale = useMotionValue(1);
@@ -57,7 +58,7 @@ export function ResultView() {
   }, [fill, reduceMotion, level]);
 
   useEffect(() => {
-    const controls = animate(count, attend, { duration: reduceMotion ? 0 : 0.9, ease: "easeOut" });
+    const controls = animate(count, attend, { duration: reduceMotion ? 0 : 1.4, ease: "easeOut" });
     return () => controls.stop();
   }, [attend, count, reduceMotion]);
 
@@ -65,7 +66,12 @@ export function ResultView() {
   useEffect(() => {
     if (reduceMotion) return;
     const calm = reached ? 0.35 : 1;
-    const controls = animate(waveScale, [2.2, calm], { duration: 1.4, ease: "easeOut" });
+    // 현재 크기에서 서서히 커졌다가 잦아들게 합니다. (바로 2배로 튀면 +1 일 때 뚝 끊겨 보임)
+    const controls = animate(waveScale, [waveScale.get(), 1.7, calm], {
+      duration: 2.2,
+      times: [0, 0.35, 1],
+      ease: "easeInOut",
+    });
     return () => controls.stop();
   }, [attend, reached, reduceMotion, waveScale]);
 
