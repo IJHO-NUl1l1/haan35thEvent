@@ -15,12 +15,14 @@ export function Finale() {
 
   useEffect(() => {
     if (!container.current) return;
+    // 휴대폰처럼 좁은 화면에서는 불꽃 수와 크기를 줄입니다.
+    const compact = window.matchMedia("(max-width: 640px)").matches;
     const fireworks = new Fireworks(container.current, {
       hue: { min: 35, max: 50 }, // 금색 계열
       brightness: { min: 60, max: 85 },
-      intensity: 24,
-      particles: 70,
-      explosion: 6,
+      intensity: compact ? 10 : 24,
+      particles: compact ? 35 : 70,
+      explosion: compact ? 3 : 6,
       traceLength: 3,
       acceleration: 1.03,
       decay: { min: 0.012, max: 0.022 },
