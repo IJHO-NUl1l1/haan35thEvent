@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState, useSyncExternalStore } from "react";
-import { EVENT } from "@/config/event";
+import { EVENT, MOCK_TOOLS_ENABLED } from "@/config/event";
 import { useCelebration } from "@/hooks/useCelebration";
 import { useRsvpStats } from "@/hooks/useRsvpStats";
 import { smallBurst } from "@/lib/celebrate";
@@ -12,7 +12,7 @@ import { LogoSlot } from "./LogoSlot";
 import { MockControls } from "./MockControls";
 import { ProgressMeter } from "./ProgressMeter";
 
-const isDev = process.env.NODE_ENV === "development";
+const showMockTools = MOCK_TOOLS_ENABLED || process.env.NODE_ENV === "development";
 
 // QR 을 찍고 들어오는 모바일 화면. 참여/불참 응답 → 결과 화면.
 export function JoinView() {
@@ -94,7 +94,7 @@ export function JoinView() {
       </section>
 
       {/* 모바일에서는 고정 위치가 로고·버튼을 가려서 본문 아래에 둡니다. */}
-      {isDev && <MockControls onChange={refresh} className="mx-auto mt-6" />}
+      {showMockTools && <MockControls onChange={refresh} className="mx-auto mt-6" />}
     </main>
   );
 }
