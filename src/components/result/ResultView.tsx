@@ -77,14 +77,20 @@ export function ResultView() {
 
   // 새 참여자가 생기면 수면에서 "+N" 이 떠오릅니다. (렌더 중 이전 값과 비교해 상태를 맞추는 패턴)
   const [prevAttend, setPrevAttend] = useState<number | null>(null);
-  const [floaters, setFloaters] = useState<{ key: string; delta: number; left: number }[]>([]);
+  // 초기화 후 같은 숫자 변화가 반복될 수 있어서, 키는 계속 증가하는 일련번호로 붙입니다.
+  const [floaters, setFloaters] = useState<{ nextId: number; list: { id: number; delta: number; left: number }[] }>({
+    nextId: 0,
+    list: [],
+  });
   if ((stats || preview !== null) && attend !== prevAttend) {
     if (prevAttend !== null && attend > prevAttend) {
-      const floater = { key: `${prevAttend}-${attend}`, delta: attend - prevAttend, left: 30 + ((attend * 17) % 40) };
-      setFloaters((list) => [...list, floater]);
+      const delta = attend - prevAttend;
+      const left = 30 + ((attend * 17) % 40);
+      setFloaters(({ nextId, list }) => ({ nextId: nextId + 1, list: [...list, { id: nextId, delta, left }] }));
     }
     setPrevAttend(attend);
   }
+  const removeFloater = (id: number) => setFloaters((s) => ({ ...s, list: s.list.filter((x) => x.id !== id) }));
 
   const badges = [
     ...(stats?.mock ? ["MOCK 데이터"] : []),
@@ -103,15 +109,15 @@ export function ResultView() {
 
       <AnimatePresence>
         {!reduceMotion &&
-          floaters.map((f) => (
+          floaters.list.map((f) => (
             <motion.span
-              key={f.key}
+              key={f.id}
               className="pointer-events-none absolute rounded-full bg-gold px-3 py-1 text-lg font-bold text-ink shadow-sm"
               style={{ left: `${f.left}%`, bottom: `${fill * 100}%` }}
               initial={{ opacity: 0, y: 0, scale: 0.8 }}
               animate={{ opacity: [0, 1, 1, 0], y: -140, scale: 1 }}
               transition={{ duration: 2, ease: "easeOut" }}
-              onAnimationComplete={() => setFloaters((list) => list.filter((x) => x.key !== f.key))}
+              onAnimationComplete={() => removeFloater(f.id)}
             >
               +{f.delta}
             </motion.span>
