@@ -36,8 +36,21 @@ export function ResultContent({ tone, count, attend, goal, reached, badges }: Pr
       </header>
 
       <main className="flex flex-1 flex-col items-center justify-center px-6 pb-16 text-center">
+        {/* 목표 달성 시: 숫자가 한 번 크게 튀어오르고, 이후 금빛 후광이 천천히 숨 쉬듯 반복됩니다. */}
         <motion.p
           className={`text-[clamp(7rem,26vmin,19rem)] font-extrabold leading-[0.85] tracking-[-0.05em] tabular-nums ${dark ? "text-brand" : "text-white"}`}
+          animate={
+            reached
+              ? {
+                  scale: [1, 1.14, 1],
+                  textShadow: ["0 0 0px rgba(217,164,65,0)", "0 0 48px rgba(217,164,65,0.75)"],
+                }
+              : { scale: 1, textShadow: "0 0 0px rgba(217,164,65,0)" }
+          }
+          transition={{
+            scale: { delay: 1.2, duration: 0.9, ease: "easeOut" },
+            textShadow: { delay: 2, duration: 2.4, repeat: Infinity, repeatType: "mirror", ease: "easeInOut" },
+          }}
         >
           {count}
         </motion.p>
