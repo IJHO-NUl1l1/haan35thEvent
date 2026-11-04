@@ -46,8 +46,8 @@ export function ResultView() {
   // 물 높이: 스프링으로 살짝 넘쳤다가 자리를 잡아 출렁이는 느낌을 줍니다.
   // visualDuration 을 고정해서 +1 처럼 짧은 거리도 +10 과 같은 시간에 걸쳐 천천히 올라갑니다.
   const level = useSpring(0, { visualDuration: 1.8, bounce: 0.2 });
-  // 물결은 물 본체 위로 솟아 있어서(Waves 높이의 절반), 흰 글자 경계도 그만큼 올려 수면 평균선에 맞춥니다.
-  const clipPath = useTransform(level, (v) => `inset(calc(${(1 - v) * 100}% - 24px) 0 0 0)`);
+  // 흰 글자가 보이는 영역 = 수위 아래. (물결 가운데 선이 수위와 같아서 그대로 맞습니다)
+  const clipPath = useTransform(level, (v) => `inset(${(1 - v) * 100}% 0 0 0)`);
   const waveScale = useMotionValue(1);
   const count = useMotionValue(0);
   const rounded = useTransform(count, (v) => Math.round(v));

@@ -18,10 +18,12 @@ const LAYERS = [
 ];
 
 // 수면 위의 물결 여러 겹. scale 로 출렁임 세기를 조절합니다 (새 참여자 반응, 가득 찼을 때 잔잔하게).
+// 물결의 가운데 선이 실제 수위와 일치하도록 물 본체 윗변에 반쯤 걸쳐 두고, 가운데를 기준으로 늘립니다.
+// 아래 절반이 물 본체와 겹치므로 둘 사이에 이음선이 생기지 않습니다.
 export function Waves({ scale }: { scale: MotionValue<number> }) {
   return (
     <motion.div
-      className="pointer-events-none absolute inset-x-0 bottom-full h-12 origin-bottom"
+      className="pointer-events-none absolute inset-x-0 top-0 h-12 -translate-y-1/2 origin-center"
       style={{ scaleY: scale }}
       aria-hidden
     >
