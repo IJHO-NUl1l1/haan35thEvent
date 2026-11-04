@@ -3,7 +3,8 @@
 // 테이블 생성 SQL 은 supabase/schema.sql 에 있습니다.
 import "server-only";
 import { createClient } from "@supabase/supabase-js";
-import type { RsvpStatus } from "./rsvp";
+import { EVENT } from "@/config/event";
+import type { RsvpStats, RsvpStatus } from "./rsvp";
 
 const TABLE = "rsvp_responses";
 
@@ -41,7 +42,21 @@ export async function getCounts() {
   return { attend, decline };
 }
 
-// 같은 기기(voterId)가 다시 응답하면 덮어씁니다. 중복 집계 방지.
+export async function getStats(): Promise<RsvpStats> {
+  const counts = await getCounts();
+  return { ...counts, goal: EVENT.goal.value, goalMock: EVENT.goal.mock, mock: STORE_IS_MOCK };
+}
+
+export async function getResponse(voterId: string): Promise<RsvpStatus | null> {
+  if (supabase) {
+    const { data, error } = await supabase.from(TABLE).select("status").eq("voter_id", voterId).maybeSingle();
+    if (error) throw error;
+    return data?.status ?? null;
+  }
+  return mockResponses.get(voterId) ?? null;
+}
+
+// 같은 브라우저(voterId)가 다시 응답하면 덮어씁니다. 중복 집계 방지.
 export async function saveResponse(voterId: string, status: RsvpStatus) {
   if (supabase) {
     const { error } = await supabase

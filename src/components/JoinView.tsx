@@ -1,12 +1,12 @@
 "use client";
 
-import { useState, useSyncExternalStore } from "react";
+import { useEffect, useState, useSyncExternalStore } from "react";
 import { EVENT } from "@/config/event";
 import { useCelebration } from "@/hooks/useCelebration";
 import { useRsvpStats } from "@/hooks/useRsvpStats";
 import { smallBurst } from "@/lib/celebrate";
-import { getMyStatus, getVoterId, setMyStatus, subscribeMyStatus } from "@/lib/my-response";
-import { submitResponse, type RsvpStatus } from "@/lib/rsvp";
+import { getLocalVoterId, getMyStatus, setLocalVoterId, setMyStatus, subscribeMyStatus } from "@/lib/my-response";
+import { fetchMyResponse, submitResponse, type RsvpStatus } from "@/lib/rsvp";
 import { EventDetails, EventIntro } from "./EventInfo";
 import { LogoSlot } from "./LogoSlot";
 import { MockControls } from "./MockControls";
@@ -22,11 +22,24 @@ export function JoinView() {
   const [failed, setFailed] = useState(false);
   useCelebration(!!stats && stats.attend >= stats.goal);
 
+  // 들어올 때 서버에 이 브라우저의 기존 응답을 물어보고 localStorage 를 맞춥니다.
+  useEffect(() => {
+    fetchMyResponse(getLocalVoterId()).then(
+      (me) => {
+        if (me.voterId) setLocalVoterId(me.voterId);
+        setMyStatus(me.status);
+      },
+      () => {}, // 실패하면 localStorage 에 남은 값으로 그대로 보여줍니다.
+    );
+  }, []);
+
   async function respond(status: RsvpStatus) {
     setPending(status);
     setFailed(false);
     try {
-      setStats(await submitResponse(getVoterId(), status));
+      const result = await submitResponse(getLocalVoterId(), status);
+      setLocalVoterId(result.voterId);
+      setStats(result);
       setMyStatus(status);
       if (status === "attend") smallBurst();
     } catch {

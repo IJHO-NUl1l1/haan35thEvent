@@ -10,6 +10,8 @@ export type RsvpStats = {
   mock: boolean;
 };
 
+export type MyResponse = { voterId: string | null; status: RsvpStatus | null };
+
 export function isRsvpStatus(value: unknown): value is RsvpStatus {
   return value === "attend" || value === "decline";
 }
@@ -20,11 +22,22 @@ export async function fetchStats(): Promise<RsvpStats> {
   return res.json();
 }
 
-export async function submitResponse(voterId: string, status: RsvpStatus): Promise<RsvpStats> {
+// localStorage 의 voterId 를 함께 보내 서버 쿠키가 지워졌어도 기존 응답을 찾습니다.
+export async function fetchMyResponse(localVoterId: string | null): Promise<MyResponse> {
+  const query = localVoterId ? `?vid=${encodeURIComponent(localVoterId)}` : "";
+  const res = await fetch(`/api/rsvp/me${query}`, { cache: "no-store" });
+  if (!res.ok) throw new Error(`GET /api/rsvp/me ${res.status}`);
+  return res.json();
+}
+
+export async function submitResponse(
+  localVoterId: string | null,
+  status: RsvpStatus,
+): Promise<RsvpStats & { voterId: string }> {
   const res = await fetch("/api/rsvp", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ voterId, status }),
+    body: JSON.stringify({ voterId: localVoterId, status }),
   });
   if (!res.ok) throw new Error(`POST /api/rsvp ${res.status}`);
   return res.json();

@@ -32,6 +32,19 @@ src/
     celebrate.ts         축하 이펙트 (canvas-confetti)
 ```
 
+## 중복 응답 방지 (브라우저당 1표)
+
+응답자 식별자(voterId)를 두 곳에 저장하고, 하나만 남아 있어도 서로 복구합니다.
+
+| 저장 위치 | 역할 |
+|---|---|
+| 서버 쿠키 `haan35_vid` (HttpOnly, 1년) | 주 식별자. 아이폰 Safari의 7일 미방문 시 localStorage 삭제를 피함 |
+| localStorage `haan35.voterId`, `haan35.status` | 백업 + 화면 즉시 표시용 캐시 |
+
+- `/join` 진입 시 `/api/rsvp/me`로 기존 응답을 확인하고, 쿠키와 localStorage를 서로 맞춥니다.
+- 다시 응답하면 같은 voterId 행을 덮어씁니다 (DB `voter_id` 기본 키).
+- 막을 수 없는 경우: 시크릿 모드, 다른 브라우저나 앱(카메라→Safari, 카카오톡 인앱 등), 사용자가 사이트 데이터를 직접 삭제한 경우.
+
 ## 교체해야 할 것
 
 - **로고**: `LogoSlot`(회색 점선 칸)을 실제 로고 `<Image>`로 바꿉니다.

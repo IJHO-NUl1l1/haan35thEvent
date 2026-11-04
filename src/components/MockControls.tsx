@@ -11,20 +11,16 @@ export function MockControls({
   className?: string;
 }) {
   async function addAttendees(count: number) {
-    await Promise.all(
-      Array.from({ length: count }, () =>
-        fetch("/api/rsvp", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ voterId: `mock-${Math.random().toString(36).slice(2)}`, status: "attend" }),
-        }),
-      ),
-    );
+    await fetch("/api/rsvp/mock", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ count }),
+    });
     onChange();
   }
 
   async function reset() {
-    await fetch("/api/rsvp", { method: "DELETE" });
+    await fetch("/api/rsvp/mock", { method: "DELETE" });
     onChange();
   }
 

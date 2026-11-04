@@ -1,4 +1,6 @@
-// 이 기기에서 응답했는지 기억합니다(localStorage). 다시 들어와도 결과 화면을 보여주기 위함.
+// 이 브라우저의 응답을 localStorage 에도 기억합니다.
+// 서버 쿠키(voter-cookie.ts)와 서로 백업 관계라, 둘 중 하나만 남아 있어도 복구됩니다.
+// 화면을 즉시 그리는 캐시 역할도 합니다. 최종 판단은 서버(/api/rsvp/me)가 합니다.
 import { isRsvpStatus, type RsvpStatus } from "./rsvp";
 
 const VOTER_ID_KEY = "haan35.voterId";
@@ -27,25 +29,23 @@ export function setMyStatus(status: RsvpStatus | null) {
     if (status) localStorage.setItem(STATUS_KEY, status);
     else localStorage.removeItem(STATUS_KEY);
   } catch {
-    // 사생활 보호 모드 등에서 저장이 막혀도 화면은 동작해야 합니다.
+    // 사생활 보호 모드 등에서 저장이 막혀도 화면은 동작해야 합니다. (서버 쿠키가 대신 기억)
   }
   listeners.forEach((listener) => listener());
 }
 
-// crypto.randomUUID 는 http(내부망 IP 접속)에서 동작하지 않아 직접 만듭니다.
-function createId() {
-  return Math.random().toString(36).slice(2) + Date.now().toString(36);
+export function getLocalVoterId() {
+  try {
+    return localStorage.getItem(VOTER_ID_KEY);
+  } catch {
+    return null;
+  }
 }
 
-export function getVoterId() {
+export function setLocalVoterId(voterId: string) {
   try {
-    let id = localStorage.getItem(VOTER_ID_KEY);
-    if (!id) {
-      id = createId();
-      localStorage.setItem(VOTER_ID_KEY, id);
-    }
-    return id;
+    localStorage.setItem(VOTER_ID_KEY, voterId);
   } catch {
-    return createId();
+    // 위와 동일
   }
 }
