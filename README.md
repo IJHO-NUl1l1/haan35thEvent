@@ -49,7 +49,7 @@ src/
 
 - **로고**: `LogoSlot`(회색 점선 칸)을 실제 로고 `<Image>`로 바꿉니다.
 - **MOCK 값**: `src/config/event.ts`의 문구·일시·장소·목표 인원. 확정되면 값을 바꾸고 `mock: false`로 설정합니다.
-- **DB (Supabase)**: `supabase/schema.sql`을 Supabase SQL Editor에서 실행하고, `.env.local`에 `SUPABASE_SECRET_KEY`를 넣으면 Supabase에 저장됩니다. 키가 없으면 MOCK(서버 메모리)으로 동작하며, 재시작하면 초기화되고 Vercel처럼 인스턴스가 여러 개인 환경에서는 집계가 맞지 않습니다.
+- **DB (Supabase)**: Supabase에 `rsvp_responses` 테이블(`voter_id` 기본 키, `status`, `created_at`, `updated_at`)을 만들고, `.env.local`에 `SUPABASE_SECRET_KEY`를 넣으면 Supabase에 저장됩니다. 키가 없으면 MOCK(서버 메모리)으로 동작하며, 재시작하면 초기화되고 Vercel처럼 인스턴스가 여러 개인 환경에서는 집계가 맞지 않습니다.
 - **브랜드 색**: `src/app/globals.css`의 `--color-brand` 계열을 로고 색에 맞춥니다.
 - **도메인**: 배포 후 환경변수 `NEXT_PUBLIC_SITE_URL`에 실제 주소를 넣으면 QR이 그 주소로 만들어집니다.
 

@@ -1,6 +1,5 @@
 // 응답 저장소.
 // SUPABASE_URL 과 SUPABASE_SECRET_KEY 가 있으면 Supabase 에 저장하고, 없으면 MOCK(서버 메모리)으로 동작합니다.
-// 테이블 생성 SQL 은 supabase/schema.sql 에 있습니다.
 import "server-only";
 import { createClient } from "@supabase/supabase-js";
 import { EVENT } from "@/config/event";
