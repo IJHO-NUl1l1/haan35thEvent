@@ -5,11 +5,17 @@ import { addMockAttendees, clearResponses, getStats } from "@/lib/rsvp-store";
 const forbidden = () => Response.json({ error: "forbidden" }, { status: 403 });
 const blocked = !MOCK_TOOLS_ENABLED && process.env.NODE_ENV === "production";
 
+// { count: n } → n명 추가 / { fillToGoal: true } → 현재 목표 인원까지 부족한 만큼 추가
 export async function POST(request: Request) {
   if (blocked) return forbidden();
   const body = await request.json().catch(() => null);
-  const count = Math.min(50, Math.max(1, Number(body?.count) || 1));
-  await addMockAttendees(count);
+
+  if (body?.fillToGoal) {
+    const { attend, goal } = await getStats();
+    if (goal > attend) await addMockAttendees(goal - attend);
+  } else {
+    await addMockAttendees(Math.min(50, Math.max(1, Number(body?.count) || 1)));
+  }
   return Response.json(await getStats());
 }
 
