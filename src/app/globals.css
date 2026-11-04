@@ -17,3 +17,25 @@ body {
   word-break: keep-all;
   -webkit-tap-highlight-color: transparent;
 }
+
+/* 결과 페이지(/result) 물결·기포 */
+@keyframes wave-x {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+
+@keyframes bubble-rise {
+  0% { transform: translate3d(0, 0, 0); opacity: 0; }
+  10% { opacity: 0.7; }
+  100% { transform: translate3d(var(--drift, 0px), -100vh, 0); opacity: 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-wave,
+  .animate-bubble {
+    animation: none !important;
+  }
+  .animate-bubble {
+    display: none;
+  }
+}

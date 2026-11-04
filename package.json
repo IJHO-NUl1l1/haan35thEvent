@@ -11,6 +11,8 @@
   "dependencies": {
     "@supabase/supabase-js": "^2.118.0",
     "canvas-confetti": "^1.9.4",
+    "fireworks-js": "^2.10.8",
+    "motion": "^14.9.1",
     "next": "16.4.5",
     "qrcode.react": "^4.2.0",
     "react": "19.3.0",

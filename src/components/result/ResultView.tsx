@@ -1,0 +1,120 @@
+"use client";
+
+import {
+  animate,
+  AnimatePresence,
+  motion,
+  useMotionValue,
+  useReducedMotion,
+  useSpring,
+  useTransform,
+} from "motion/react";
+import { useEffect, useState, useSyncExternalStore } from "react";
+import { EVENT, MOCK_TOOLS_ENABLED } from "@/config/event";
+import { useRsvpStats } from "@/hooks/useRsvpStats";
+import { MockControls } from "../MockControls";
+import { Finale } from "./Finale";
+import { LiquidFill } from "./LiquidFill";
+import { ResultContent } from "./ResultContent";
+
+const showMockTools = MOCK_TOOLS_ENABLED || process.env.NODE_ENV === "development";
+// 0명이어도 수면(물결)이 보이도록 최소 높이를 둡니다.
+const MIN_LEVEL = 0.04;
+
+const subscribeNothing = () => () => {};
+
+// ?preview=0.7 처럼 붙이면 그 비율로 고정해서 보여줍니다 (디자인 확인용).
+function readPreview() {
+  const value = new URLSearchParams(window.location.search).get("preview");
+  if (value === null) return null;
+  const ratio = Number(value);
+  return Number.isFinite(ratio) ? Math.min(1.5, Math.max(0, ratio)) : null;
+}
+
+// 최종 결과 화면: 참여 인원만큼 화면 아래에서 물이 차오르고, 목표에 닿으면 축하 연출이 나옵니다.
+export function ResultView() {
+  const { stats, mutate } = useRsvpStats(3000);
+  const preview = useSyncExternalStore(subscribeNothing, readPreview, () => null);
+  const reduceMotion = useReducedMotion();
+
+  const goal = stats?.goal ?? EVENT.goal.value;
+  // 목표를 넘겨도 숫자는 계속 올라가고, 물은 가득 찬 상태를 유지합니다.
+  const attend = preview !== null ? Math.round(goal * preview) : (stats?.attend ?? 0);
+  const reached = (preview !== null || !!stats) && attend >= goal;
+  const fill = Math.max(MIN_LEVEL, Math.min(1, attend / goal));
+
+  // 물 높이: 스프링으로 살짝 넘쳤다가 자리를 잡아 출렁이는 느낌을 줍니다.
+  const level = useSpring(0, { stiffness: 30, damping: 8 });
+  // 물결은 물 본체 위로 솟아 있어서(Waves 높이의 절반), 흰 글자 경계도 그만큼 올려 수면 평균선에 맞춥니다.
+  const clipPath = useTransform(level, (v) => `inset(calc(${(1 - v) * 100}% - 24px) 0 0 0)`);
+  const waveScale = useMotionValue(1);
+  const count = useMotionValue(0);
+  const rounded = useTransform(count, (v) => Math.round(v));
+
+  useEffect(() => {
+    if (reduceMotion) level.jump(fill);
+    else level.set(fill);
+  }, [fill, reduceMotion, level]);
+
+  useEffect(() => {
+    const controls = animate(count, attend, { duration: reduceMotion ? 0 : 0.9, ease: "easeOut" });
+    return () => controls.stop();
+  }, [attend, count, reduceMotion]);
+
+  // 인원이 바뀌면 수면이 한 번 크게 출렁이고, 가득 찬 뒤에는 잔잔해집니다.
+  useEffect(() => {
+    if (reduceMotion) return;
+    const calm = reached ? 0.35 : 1;
+    const controls = animate(waveScale, [2.2, calm], { duration: 1.4, ease: "easeOut" });
+    return () => controls.stop();
+  }, [attend, reached, reduceMotion, waveScale]);
+
+  // 새 참여자가 생기면 수면에서 "+N" 이 떠오릅니다. (렌더 중 이전 값과 비교해 상태를 맞추는 패턴)
+  const [prevAttend, setPrevAttend] = useState<number | null>(null);
+  const [floaters, setFloaters] = useState<{ key: string; delta: number; left: number }[]>([]);
+  if ((stats || preview !== null) && attend !== prevAttend) {
+    if (prevAttend !== null && attend > prevAttend) {
+      const floater = { key: `${prevAttend}-${attend}`, delta: attend - prevAttend, left: 30 + ((attend * 17) % 40) };
+      setFloaters((list) => [...list, floater]);
+    }
+    setPrevAttend(attend);
+  }
+
+  const badges = [
+    ...(stats?.mock ? ["MOCK 데이터"] : []),
+    ...(stats?.goalMock ? ["목표 인원 MOCK"] : []),
+    ...(preview !== null ? ["PREVIEW"] : []),
+  ];
+  const contentProps = { count: rounded, attend, goal, reached, badges };
+
+  return (
+    <div className="relative h-dvh select-none overflow-hidden bg-paper">
+      <ResultContent tone="dark" {...contentProps} />
+      <LiquidFill level={level} waveScale={waveScale} />
+      <motion.div className="pointer-events-none absolute inset-0" style={{ clipPath }} aria-hidden>
+        <ResultContent tone="light" {...contentProps} />
+      </motion.div>
+
+      <AnimatePresence>
+        {!reduceMotion &&
+          floaters.map((f) => (
+            <motion.span
+              key={f.key}
+              className="pointer-events-none absolute rounded-full bg-gold px-3 py-1 text-lg font-bold text-ink shadow-sm"
+              style={{ left: `${f.left}%`, bottom: `${fill * 100}%` }}
+              initial={{ opacity: 0, y: 0, scale: 0.8 }}
+              animate={{ opacity: [0, 1, 1, 0], y: -140, scale: 1 }}
+              transition={{ duration: 2, ease: "easeOut" }}
+              onAnimationComplete={() => setFloaters((list) => list.filter((x) => x.key !== f.key))}
+            >
+              +{f.delta}
+            </motion.span>
+          ))}
+      </AnimatePresence>
+
+      {reached && !reduceMotion && <Finale />}
+
+      {showMockTools && preview === null && <MockControls mutate={mutate} className="fixed left-1/2 top-3 z-10 -translate-x-1/2" />}
+    </div>
+  );
+}
