@@ -1,7 +1,6 @@
 import { AnimatePresence, motion, type MotionValue } from "motion/react";
-import { EVENT } from "@/config/event";
-import { LogoSlot } from "../LogoSlot";
 import { MockBadge } from "../MockBadge";
+import { SignalLightLogo } from "../SignalLightLogo";
 import { Scale } from "./Scale";
 
 type Props = {
@@ -23,11 +22,7 @@ export function ResultContent({ tone, count, attend, goal, reached, badges }: Pr
     <div className={`absolute inset-0 flex flex-col ${dark ? "text-ink" : "text-white"}`}>
       {/* 오른쪽 위는 눈금자의 목표 표시 자리라 비워 둡니다. */}
       <header className="flex flex-wrap items-center gap-3 px-6 pt-6 pr-28 sm:px-10 sm:pt-8 sm:pr-32">
-        <LogoSlot tone={tone} className="h-11 w-32 sm:h-12 sm:w-40" />
-        <div className="hidden sm:block">
-          <p className="text-sm font-semibold">{EVENT.orgName}</p>
-          <p className={`text-xs ${dark ? "text-muted" : "text-white/70"}`}>{EVENT.title}</p>
-        </div>
+        <SignalLightLogo />
         <div className="flex flex-wrap gap-1.5">
           {badges.map((badge) => (
             <MockBadge key={badge} label={badge} />

@@ -2,8 +2,8 @@ import type { Metadata, Viewport } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "하안종합사회복지관 개관 35주년",
-  description: "하안종합사회복지관 개관 35주년 기념행사 참여 안내",
+  title: "웹기반 온(ON)동네 복지안전망 Signal Light",
+  description: "광명시립 하안종합사회복지관 웹기반 온(ON)동네 복지안전망 Signal Light",
 };
 
 export const viewport: Viewport = {

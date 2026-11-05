@@ -1,16 +1,16 @@
 "use client";
 
 import { useEffect, useRef, useState, useSyncExternalStore } from "react";
-import { EVENT, MOCK_TOOLS_ENABLED } from "@/config/event";
+import { MOCK_TOOLS_ENABLED } from "@/config/event";
 import { useCelebration } from "@/hooks/useCelebration";
 import { useRsvpStats } from "@/hooks/useRsvpStats";
 import { smallBurst } from "@/lib/celebrate";
 import { getLocalVoterId, getMyStatus, setLocalVoterId, setMyStatus, subscribeMyStatus } from "@/lib/my-response";
 import { fetchMyResponse, shiftStats, submitResponse, type RsvpStatus } from "@/lib/rsvp";
-import { EventDetails, EventIntro } from "./EventInfo";
-import { LogoSlot } from "./LogoSlot";
+import { EventIntro, EventTitle } from "./EventInfo";
 import { MockControls } from "./MockControls";
 import { ProgressMeter } from "./ProgressMeter";
+import { SignalLightLogo } from "./SignalLightLogo";
 
 const showMockTools = MOCK_TOOLS_ENABLED || process.env.NODE_ENV === "development";
 
@@ -60,16 +60,10 @@ export function JoinView() {
 
   return (
     <main className="mx-auto flex min-h-dvh w-full max-w-md flex-col px-5 pb-12 pt-8 sm:pt-16">
-      <LogoSlot className="h-12 w-36" />
+      <SignalLightLogo />
 
-      <p className="mt-10 text-sm font-semibold text-brand">35th Anniversary</p>
-      <h1 className="mt-2 text-[26px] font-bold leading-snug tracking-tight sm:text-3xl">
-        {EVENT.orgName}
-        <br />
-        {EVENT.title}
-      </h1>
+      <EventTitle className="mt-10 text-[26px] font-bold leading-snug tracking-tight sm:text-3xl" />
       <EventIntro className="mt-4" />
-      <EventDetails className="mt-7" />
 
       <section className="mt-8 rounded-2xl border border-line bg-white p-5 sm:p-6">
         {myStatus && !editing ? (
@@ -90,7 +84,7 @@ export function JoinView() {
                 className="h-14 rounded-xl bg-brand text-base font-semibold text-white transition active:scale-[0.99]"
                 onClick={() => respond("attend")}
               >
-                참여할게요
+                응원으로 함께하기
               </button>
               <button
                 className="h-14 rounded-xl border border-line bg-white text-base font-semibold text-ink transition active:scale-[0.99]"
@@ -124,9 +118,7 @@ function Result({ status, onChange }: { status: RsvpStatus; onChange: () => void
         </svg>
       </div>
       <p className="mt-4 text-lg font-bold">{attending ? "참여 신청이 완료되었어요" : "응답해 주셔서 감사해요"}</p>
-      <p className="mt-1 text-sm text-muted">
-        {attending ? "행사 당일에 반갑게 맞이할게요." : "다음 자리에서 꼭 뵐게요."}
-      </p>
+      {attending && <p className="mt-1 text-sm text-muted">행사 당일에 반갑게 맞이할게요.</p>}
       <button className="mt-4 text-sm text-muted underline underline-offset-4" onClick={onChange}>
         응답 바꾸기
       </button>

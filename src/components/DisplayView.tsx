@@ -1,14 +1,14 @@
 "use client";
 
-import { EVENT, MOCK_TOOLS_ENABLED } from "@/config/event";
+import { MOCK_TOOLS_ENABLED } from "@/config/event";
 import { useCelebration } from "@/hooks/useCelebration";
 import { useRsvpStats } from "@/hooks/useRsvpStats";
-import { EventDetails, EventIntro } from "./EventInfo";
+import { EventIntro, EventTitle } from "./EventInfo";
 import { EventQr } from "./EventQr";
-import { LogoSlot } from "./LogoSlot";
 import { MockBadge } from "./MockBadge";
 import { MockControls } from "./MockControls";
 import { ProgressMeter } from "./ProgressMeter";
+import { SignalLightLogo } from "./SignalLightLogo";
 
 const showMockTools = MOCK_TOOLS_ENABLED || process.env.NODE_ENV === "development";
 
@@ -20,32 +20,15 @@ export function DisplayView() {
   return (
     <div className="flex min-h-dvh flex-col">
       <header className="mx-auto flex w-full max-w-6xl items-center justify-between gap-4 px-5 pt-6 sm:px-8 lg:pt-10">
-        <div className="flex items-center gap-3">
-          <LogoSlot className="h-11 w-32 sm:h-12 sm:w-40" />
-          <span className="hidden text-sm font-medium text-muted sm:inline">{EVENT.orgName}</span>
-        </div>
+        <SignalLightLogo />
         {stats?.mock && <MockBadge label="MOCK 데이터" />}
       </header>
 
       <main className="mx-auto grid w-full max-w-6xl flex-1 items-center gap-10 px-5 py-10 sm:px-8 lg:py-8 lg:grid-cols-[1.3fr_1fr] lg:gap-20">
         <section>
-          <p className="flex items-end gap-3">
-            <span className="text-[clamp(5.5rem,13vw,10rem)] font-extrabold leading-[0.8] tracking-[-0.05em] text-brand">
-              35
-            </span>
-            <span className="pb-1 text-xs font-semibold uppercase tracking-[0.25em] text-muted sm:text-sm">
-              th
-              <br />
-              Anniversary
-            </span>
-          </p>
-          <h1 className="mt-8 text-3xl font-bold leading-tight tracking-tight sm:text-4xl lg:text-5xl">
-            {EVENT.orgName}
-            <br />
-            {EVENT.title}
-          </h1>
+          <SignalLightLogo className="text-[1.4px] sm:text-[1.8px]" />
+          <EventTitle className="mt-8 text-3xl font-bold leading-tight tracking-tight sm:text-4xl lg:text-5xl" />
           <EventIntro className="mt-5 max-w-xl" />
-          <EventDetails className="mt-8 max-w-xl" />
         </section>
 
         <section className="mx-auto w-full max-w-xs sm:max-w-sm lg:mx-0 lg:max-w-[360px] lg:justify-self-end">
