@@ -30,12 +30,12 @@ export function SignalLightLogo({
       style={{ width: "227em", height: "68em" }}
     >
       <Image
-        src="/symbol.webp"
+        src="/symbol.png"
         alt=""
-        width={48}
-        height={48}
+        width={645}
+        height={645}
         className="absolute"
-        style={{ left: "7.5em", top: "12.8em", width: "44em", height: "44em" }}
+        style={{ left: "8em", top: "13em", width: "43em", height: "43em" }}
       />
       {/* 위치(em)는 바깥 배율 기준, 글자 크기는 안쪽 span 에서 따로 지정 */}
       {LINES.map((line) => (
