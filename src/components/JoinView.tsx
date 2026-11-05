@@ -10,7 +10,7 @@ import { fetchMyResponse, shiftStats, submitResponse, type RsvpStatus } from "@/
 import { EventIntro, EventTitle } from "./EventInfo";
 import { MockControls } from "./MockControls";
 import { ProgressMeter } from "./ProgressMeter";
-import { SignalLightLogo } from "./SignalLightLogo";
+import { SiteHeader } from "./SiteHeader";
 
 const showMockTools = MOCK_TOOLS_ENABLED || process.env.NODE_ENV === "development";
 
@@ -59,13 +59,13 @@ export function JoinView() {
   }
 
   return (
-    <main className="mx-auto flex min-h-dvh w-full max-w-md flex-col px-5 pb-12 pt-8 sm:pt-16">
-      <SignalLightLogo />
+    <main className="mx-auto flex min-h-dvh w-full max-w-md flex-col px-5 pb-12 pt-6 sm:pt-10">
+      <SiteHeader />
 
       <EventTitle className="mt-10 text-[26px] font-bold leading-snug tracking-tight sm:text-3xl" />
       <EventIntro page="join" className="mt-4" />
 
-      <section className="mt-8 rounded-2xl border border-line bg-white p-5 sm:p-6">
+      <section className="mt-8 rounded-2xl border border-line bg-white/[0.07] p-5 sm:p-6">
         {myStatus && !editing ? (
           <Result status={myStatus} onChange={() => setEditing(true)} />
         ) : (
@@ -81,19 +81,19 @@ export function JoinView() {
             )}
             <div className="mt-4 grid gap-2.5">
               <button
-                className="h-14 rounded-xl bg-brand text-base font-semibold text-white transition active:scale-[0.99]"
+                className="h-14 rounded-xl bg-white text-base font-bold text-paper transition hover:bg-white/90 active:scale-[0.99]"
                 onClick={() => respond("attend")}
               >
                 응원으로 함께하기
               </button>
               <button
-                className="h-14 rounded-xl border border-line bg-white text-base font-semibold text-ink transition active:scale-[0.99]"
+                className="h-14 rounded-xl border border-white/35 text-base font-semibold text-white transition hover:bg-white/10 active:scale-[0.99]"
                 onClick={() => respond("decline")}
               >
                 이번엔 어려워요
               </button>
             </div>
-            {failed && <p className="mt-3 text-sm text-red-600">전송하지 못했어요. 잠시 후 다시 눌러 주세요.</p>}
+            {failed && <p className="mt-3 text-sm text-pink">전송하지 못했어요. 잠시 후 다시 눌러 주세요.</p>}
           </div>
         )}
 
@@ -112,7 +112,7 @@ function Result({ status, onChange }: { status: RsvpStatus; onChange: () => void
   const attending = status === "attend";
   return (
     <div className="text-center">
-      <div className="mx-auto grid size-12 place-items-center rounded-full bg-brand-soft text-brand">
+      <div className="mx-auto grid size-12 place-items-center rounded-full bg-signal text-paper">
         <svg viewBox="0 0 24 24" className="size-6" fill="none" stroke="currentColor" strokeWidth={2.5} aria-hidden>
           <path d="M5 12.5l4.5 4.5L19 7.5" strokeLinecap="round" strokeLinejoin="round" />
         </svg>

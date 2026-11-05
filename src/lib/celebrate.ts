@@ -1,5 +1,6 @@
 // 축하 이펙트(canvas-confetti). 브라우저에서만 불러옵니다.
-const COLORS = ["#1f5a46", "#d9a441", "#e07a5f", "#f2e8cf"];
+// Signal Light 심볼 색 + 흰색
+const COLORS = ["#14a8e2", "#11c0b1", "#aed843", "#f23188", "#ffffff"];
 
 async function loadConfetti() {
   return (await import("canvas-confetti")).default;

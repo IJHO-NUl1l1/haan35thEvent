@@ -32,7 +32,8 @@ export function MockControls({
   const reset = () =>
     mutate((s) => ({ ...s, attend: 0, decline: 0 }), () => send({ method: "DELETE" })).catch(() => {});
 
-  const button = "rounded-md border border-line bg-white px-2.5 py-1.5 text-xs font-medium hover:bg-stone-50";
+  const button =
+    "rounded-md border border-amber-200 bg-white px-2.5 py-1.5 text-xs font-medium text-navy hover:bg-amber-50";
   return (
     <div className={`${className} flex flex-wrap items-center justify-center gap-2 rounded-lg border border-amber-300 bg-amber-50/95 p-2 shadow-sm`}>
       <MockBadge label="MOCK 테스트" />

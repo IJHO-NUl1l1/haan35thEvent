@@ -1,15 +1,20 @@
 @import url("https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css");
 @import "tailwindcss";
 
-/* 색상 토큰. 로고가 확정되면 brand 계열을 로고 색에 맞춰 바꾸세요. */
+/* 색상 토큰. 하안종합사회복지관 Signal Light 로고에서 뽑은 색입니다.
+   paper = 바탕(로고 배경과 같은 파랑), ink = 바탕 위 글자, brand = 하늘(심볼), signal = 라임(심볼, 달성/강조) */
 @theme {
-  --color-paper: #f7f5f1;
-  --color-ink: #1c1b19;
-  --color-muted: #6b6760;
-  --color-line: #e5e1d9;
-  --color-brand: #1f5a46;
-  --color-brand-soft: #e6efe9;
-  --color-gold: #d9a441;
+  --color-paper: #194886;
+  --color-deep: #12386b;
+  --color-navy: #0d2a52;
+  --color-ink: #ffffff;
+  --color-muted: #c3d3ec;
+  --color-line: rgb(255 255 255 / 0.16);
+  --color-brand: #14a8e2;
+  --color-brand-soft: rgb(20 168 226 / 0.2);
+  --color-signal: #aed843;
+  --color-pink: #f23188;
+  --color-teal: #11c0b1;
   --font-sans: "Pretendard Variable", Pretendard, -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
 }
 

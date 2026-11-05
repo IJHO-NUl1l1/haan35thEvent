@@ -101,10 +101,10 @@ export function ResultView() {
 
   return (
     <div className="relative h-dvh select-none overflow-hidden bg-paper">
-      <ResultContent tone="dark" {...contentProps} />
+      <ResultContent tone="above" {...contentProps} />
       <LiquidFill level={level} waveScale={waveScale} />
       <motion.div className="pointer-events-none absolute inset-0" style={{ clipPath }} aria-hidden>
-        <ResultContent tone="light" {...contentProps} />
+        <ResultContent tone="below" {...contentProps} />
       </motion.div>
 
       <AnimatePresence>
@@ -112,7 +112,7 @@ export function ResultView() {
           floaters.list.map((f) => (
             <motion.span
               key={f.id}
-              className="pointer-events-none absolute rounded-full bg-gold px-3 py-1 text-lg font-bold text-ink shadow-sm"
+              className="pointer-events-none absolute rounded-full bg-signal px-3 py-1 text-lg font-bold text-navy shadow-sm"
               style={{ left: `${f.left}%`, bottom: `${fill * 100}%` }}
               initial={{ opacity: 0, y: 0, scale: 0.8 }}
               animate={{ opacity: [0, 1, 1, 0], y: -140, scale: 1 }}
@@ -126,7 +126,7 @@ export function ResultView() {
 
       {reached && !reduceMotion && <Finale />}
 
-      {showMockTools && preview === null && <MockControls mutate={mutate} className="fixed left-1/2 top-3 z-10 -translate-x-1/2" />}
+      {showMockTools && preview === null && <MockControls mutate={mutate} className="fixed left-1/2 top-3 z-20 -translate-x-1/2" />}
     </div>
   );
 }

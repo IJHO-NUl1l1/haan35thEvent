@@ -14,13 +14,13 @@ export function EventQr({ path = "/go" }: { path?: string }) {
     () => null,
   );
 
-  if (!origin) return <div className="aspect-square w-full rounded-lg bg-stone-100" />;
+  if (!origin) return <div className="aspect-square w-full rounded-lg bg-slate-100" />;
 
   const url = new URL(path, origin).toString();
   return (
     <div>
-      <QRCodeSVG value={url} size={512} level="M" marginSize={0} fgColor="#1c1b19" className="h-auto w-full" title={url} />
-      <p className="mt-4 break-all text-center text-xs text-muted">{url}</p>
+      <QRCodeSVG value={url} size={512} level="M" marginSize={0} fgColor="#0d2a52" className="h-auto w-full" title={url} />
+      <p className="mt-4 break-all text-center text-xs text-slate-500">{url}</p>
     </div>
   );
 }
