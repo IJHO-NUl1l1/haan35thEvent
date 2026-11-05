@@ -14,6 +14,7 @@ This is Website for haan 35th Year Event
 - `/go` QR에 들어가는 고정 주소. 목적지를 바꿀 때는 `src/app/go/page.tsx`만 고치면 되고, QR은 다시 인쇄하지 않아도 됩니다.
 - `/join` QR로 들어오는 모바일 화면. 기기마다 응답이 하나만 집계되고, 다시 응답하면 이전 응답을 덮어씁니다.
 - `/result` 최종 결과 화면(보여주기 전용). 참여 인원만큼 화면 아래에서 물이 차오르고, 목표에 닿으면 동심원 파동이 퍼집니다. 목표를 넘겨도 숫자는 계속 올라갑니다. `?preview=0.7`처럼 붙이면 그 비율로 고정해서 미리 볼 수 있습니다.
+- `/remote` 운영자 리모컨(숨겨진 페이지, 휴대폰용). 메뉴에는 없고 주소로만 들어갑니다. ±1/5/10/20, 숫자 입력, 목표까지 채우기, 전체 초기화. 빼기는 직접 추가한 인원에서만 빠지고 QR 응답은 건드리지 않습니다. `MOCK_TOOLS_ENABLED` 와 상관없이 항상 동작합니다.
 
 ## 구조
 
@@ -28,6 +29,7 @@ src/
     api/rsvp/route.ts    GET 집계 / POST 응답
     api/rsvp/me          이 브라우저의 기존 응답 조회
     api/rsvp/mock        MOCK 테스트 도구 (추가 / 초기화)
+    api/rsvp/remote      운영자 리모컨 (추가 / 빼기 / 초기화)
   components/            DisplayView, JoinView, EventQr, ProgressMeter, LogoSlot, MockBadge ...
   lib/
     rsvp-store.ts        저장소 (현재 MOCK: 서버 메모리) ← DB 연결 시 이 파일만 교체

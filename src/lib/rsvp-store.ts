@@ -67,15 +67,59 @@ export async function saveResponse(voterId: string, status: RsvpStatus) {
   mockResponses.set(voterId, status);
 }
 
+// MOCK 테스트·리모컨으로 직접 넣은 참여자는 voter_id 가 이 접두어로 시작합니다. (실제 응답과 구분)
+const MANUAL_PREFIX = "mock-";
+
 // MOCK 테스트용 가짜 참여자. 여러 명도 DB 요청 한 번으로 넣습니다.
 export async function addMockAttendees(count: number) {
-  const ids = Array.from({ length: count }, () => `mock-${crypto.randomUUID()}`);
+  const ids = Array.from({ length: count }, () => `${MANUAL_PREFIX}${crypto.randomUUID()}`);
   if (supabase) {
     const { error } = await supabase.from(TABLE).insert(ids.map((voter_id) => ({ voter_id, status: "attend" })));
     if (error) throw error;
     return;
   }
   ids.forEach((id) => mockResponses.set(id, "attend"));
+}
+
+// 직접 넣은 참여자 수 (리모컨에서 뺄 수 있는 최대 인원)
+export async function countManualAttendees() {
+  if (supabase) {
+    const { count, error } = await supabase
+      .from(TABLE)
+      .select("*", { count: "exact", head: true })
+      .like("voter_id", `${MANUAL_PREFIX}%`);
+    if (error) throw error;
+    return count ?? 0;
+  }
+  return [...mockResponses.keys()].filter((id) => id.startsWith(MANUAL_PREFIX)).length;
+}
+
+// 직접 넣은 참여자만 최근 것부터 count 명 뺍니다. 시민이 직접 한 응답은 건드리지 않습니다.
+// count 를 생략하면 직접 넣은 참여자를 모두 뺍니다.
+export async function removeManualAttendees(count?: number) {
+  if (supabase) {
+    if (count === undefined) {
+      const { error } = await supabase.from(TABLE).delete().like("voter_id", `${MANUAL_PREFIX}%`);
+      if (error) throw error;
+      return;
+    }
+    const { data, error } = await supabase
+      .from(TABLE)
+      .select("voter_id")
+      .like("voter_id", `${MANUAL_PREFIX}%`)
+      .order("created_at", { ascending: false })
+      .limit(count);
+    if (error) throw error;
+    const ids = data.map((row) => row.voter_id as string);
+    // 주소 길이 제한을 넘지 않도록 100개씩 나눠 지웁니다.
+    for (let i = 0; i < ids.length; i += 100) {
+      const { error: deleteError } = await supabase.from(TABLE).delete().in("voter_id", ids.slice(i, i + 100));
+      if (deleteError) throw deleteError;
+    }
+    return;
+  }
+  const ids = [...mockResponses.keys()].filter((id) => id.startsWith(MANUAL_PREFIX)).reverse();
+  ids.slice(0, count ?? ids.length).forEach((id) => mockResponses.delete(id));
 }
 
 export async function clearResponses() {
