@@ -13,7 +13,7 @@ This is Website for haan 35th Year Event
 - `/` 행사장 PC·스크린용. 3초마다 집계를 새로 불러오고, 목표 인원에 도달하면 축하 이펙트가 터집니다.
 - `/go` QR에 들어가는 고정 주소. 목적지를 바꿀 때는 `src/app/go/page.tsx`만 고치면 되고, QR은 다시 인쇄하지 않아도 됩니다.
 - `/join` QR로 들어오는 모바일 화면. 기기마다 응답이 하나만 집계되고, 다시 응답하면 이전 응답을 덮어씁니다.
-- `/result` 최종 결과 화면(보여주기 전용). 참여 인원만큼 화면 아래에서 물이 차오르고, 목표에 닿으면 동심원 파동과 불꽃놀이가 나옵니다. 목표를 넘겨도 숫자는 계속 올라갑니다. `?preview=0.7`처럼 붙이면 그 비율로 고정해서 미리 볼 수 있습니다.
+- `/result` 최종 결과 화면(보여주기 전용). 참여 인원만큼 화면 아래에서 물이 차오르고, 목표에 닿으면 동심원 파동이 퍼집니다. 목표를 넘겨도 숫자는 계속 올라갑니다. `?preview=0.7`처럼 붙이면 그 비율로 고정해서 미리 볼 수 있습니다.
 
 ## 구조
 
@@ -23,7 +23,7 @@ src/
   app/
     page.tsx             행사장 화면
     join/page.tsx        모바일 응답 화면
-    result/page.tsx      최종 결과 화면 (components/result/*, motion + fireworks-js)
+    result/page.tsx      최종 결과 화면 (components/result/*, motion)
     go/page.tsx          QR 리다이렉트
     api/rsvp/route.ts    GET 집계 / POST 응답
     api/rsvp/me          이 브라우저의 기존 응답 조회
