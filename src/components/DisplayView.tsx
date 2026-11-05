@@ -5,7 +5,6 @@ import { useCelebration } from "@/hooks/useCelebration";
 import { useRsvpStats } from "@/hooks/useRsvpStats";
 import { EventIntro, EventTitle } from "./EventInfo";
 import { EventQr } from "./EventQr";
-import { MockBadge } from "./MockBadge";
 import { MockControls } from "./MockControls";
 import { ProgressMeter } from "./ProgressMeter";
 import { SignalLightLogo } from "./SignalLightLogo";
@@ -20,9 +19,7 @@ export function DisplayView() {
 
   return (
     <div className="flex min-h-dvh flex-col">
-      <SiteHeader className="mx-auto w-full max-w-6xl px-5 pt-6 sm:px-8 lg:pt-8">
-        {stats?.mock && <MockBadge label="MOCK 데이터" />}
-      </SiteHeader>
+      <SiteHeader className="mx-auto w-full max-w-6xl px-5 pt-6 sm:px-8 lg:pt-8" />
 
       <main className="mx-auto grid w-full max-w-6xl flex-1 items-center gap-10 px-5 py-10 sm:px-8 lg:grid-cols-[1.3fr_1fr] lg:gap-20 lg:py-8">
         <section>
