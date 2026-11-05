@@ -3,13 +3,25 @@ import Image from "next/image";
 // "온(ON)동네 복지안전망 Signal Light" 로고. 받은 시안(227×68px)의 치수·색을 그대로 옮겼습니다. (배경색 없이 사용)
 // 모든 치수는 시안 픽셀값을 em 으로 적어 두었고, 바깥에서 font-size 로 배율을 정합니다.
 // 예) text-[1px] = 시안 원본 크기, text-[1.5px] = 1.5배
+// sub/main = 기본(파란 바탕용) 색. tone="navy" 는 밝은 바탕(결과 화면의 물 속)에서 쓰는 남색 글자.
 const LINES = [
-  { text: "온(ON)동네 복지안전망", top: 5.5, size: 11.8, spacing: 0, className: "text-[#DAE6F6]" },
-  { text: "Signal Light", top: 22.5, size: 19, spacing: 0, className: "font-bold text-white" },
-  { text: "광명시립 하안종합사회복지관", top: 50.5, size: 13.5, spacing: 0.02, className: "font-medium text-[#DAE6F6]" },
+  { text: "온(ON)동네 복지안전망", top: 5.5, size: 11.8, spacing: 0, weight: "", main: false },
+  { text: "Signal Light", top: 22.5, size: 19, spacing: 0, weight: "font-bold", main: true },
+  { text: "광명시립 하안종합사회복지관", top: 50.5, size: 13.5, spacing: 0.02, weight: "font-medium", main: false },
 ];
 
-export function SignalLightLogo({ className = "text-[1px]" }: { className?: string }) {
+const COLORS = {
+  light: { main: "text-white", sub: "text-[#DAE6F6]" },
+  navy: { main: "text-navy", sub: "text-navy/80" },
+};
+
+export function SignalLightLogo({
+  className = "text-[1px]",
+  tone = "light",
+}: {
+  className?: string;
+  tone?: "light" | "navy";
+}) {
   return (
     <div
       role="img"
@@ -29,7 +41,7 @@ export function SignalLightLogo({ className = "text-[1px]" }: { className?: stri
       {LINES.map((line) => (
         <div key={line.text} className="absolute" style={{ left: "64em", top: `${line.top}em` }} aria-hidden>
           <span
-            className={`block ${line.className}`}
+            className={`block ${line.weight} ${line.main ? COLORS[tone].main : COLORS[tone].sub}`}
             style={{ fontSize: `${line.size}em`, letterSpacing: `${line.spacing}em` }}
           >
             {line.text}

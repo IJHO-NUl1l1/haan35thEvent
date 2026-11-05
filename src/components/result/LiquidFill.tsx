@@ -9,7 +9,7 @@ export function LiquidFill({ level, waveScale }: { level: MotionValue<number>; w
 
   return (
     <motion.div className="pointer-events-none absolute inset-x-0 bottom-0" style={{ height }}>
-      <div className="absolute inset-0 overflow-hidden bg-gradient-to-b from-brand to-[#0b86c4]">
+      <div className="absolute inset-0 overflow-hidden bg-gradient-to-b from-water to-water-deep">
         <Bubbles />
       </div>
       {/* 물 본체 위에 그려야 겹친 부분에서 물결 모양이 유지됩니다. */}

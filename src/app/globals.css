@@ -12,6 +12,9 @@
   --color-line: rgb(255 255 255 / 0.16);
   --color-brand: #14a8e2;
   --color-brand-soft: rgb(20 168 226 / 0.2);
+  /* 결과 화면(/result)에서 차오르는 물. brand 보다 밝게 해서 물속 남색 글자가 잘 보이게 함 */
+  --color-water: #5ccbf4;
+  --color-water-deep: #26aee6;
   --color-signal: #aed843;
   --color-pink: #f23188;
   --color-teal: #11c0b1;

@@ -29,7 +29,7 @@ export function SiteHeader({
     <header className={`flex flex-wrap items-center justify-between gap-x-6 gap-y-3 ${className}`}>
       <div className="flex flex-wrap items-center gap-3">
         <Link href="/" aria-label="처음 화면으로" className="shrink-0 rounded-sm focus-visible:outline-2 focus-visible:outline-white">
-          <SignalLightLogo />
+          <SignalLightLogo tone={water ? "navy" : "light"} />
         </Link>
         {children}
       </div>
