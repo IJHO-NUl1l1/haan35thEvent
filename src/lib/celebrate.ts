@@ -15,7 +15,7 @@ function isCompact() {
 export async function celebrate() {
   const confetti = await loadConfetti();
   const compact = isCompact();
-  const end = Date.now() + (compact ? 1300 : 1800);
+  const end = Date.now() + (compact ? 1200 : 1500);
   const shared = {
     particleCount: compact ? 2 : 5,
     spread: compact ? 45 : 65,
