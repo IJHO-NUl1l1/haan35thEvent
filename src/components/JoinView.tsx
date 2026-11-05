@@ -63,7 +63,7 @@ export function JoinView() {
       <SignalLightLogo />
 
       <EventTitle className="mt-10 text-[26px] font-bold leading-snug tracking-tight sm:text-3xl" />
-      <EventIntro className="mt-4" />
+      <EventIntro page="join" className="mt-4" />
 
       <section className="mt-8 rounded-2xl border border-line bg-white p-5 sm:p-6">
         {myStatus && !editing ? (

@@ -28,7 +28,7 @@ export function DisplayView() {
         <section>
           <SignalLightLogo className="text-[1.4px] sm:text-[1.8px]" />
           <EventTitle className="mt-8 text-3xl font-bold leading-tight tracking-tight sm:text-4xl lg:text-5xl" />
-          <EventIntro className="mt-5 max-w-xl" />
+          <EventIntro page="display" className="mt-5 max-w-xl" />
         </section>
 
         <section className="mx-auto w-full max-w-xs sm:max-w-sm lg:mx-0 lg:max-w-[360px] lg:justify-self-end">
