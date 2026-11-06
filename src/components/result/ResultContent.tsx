@@ -12,14 +12,14 @@ type Props = {
   badges: string[];
 };
 
-// 결과 페이지의 글자 부분. 같은 내용을 두 번(샴페인 밖: 흰 바탕 위 남색 글자 / 샴페인 속: 금색 위 짙은 갈색 글자) 겹쳐 그려서
-// 차오르는 높이만큼 글자색이 바뀌어 보이게 합니다.
+// 결과 페이지의 글자 부분. 같은 내용을 두 번(샴페인 밖: 흰 바탕 위 남색 글자 / 샴페인 속: 금색 위에 새긴 듯한 진한 남색 글자) 겹쳐 그려서
+// 차오르는 높이만큼 글자 느낌이 바뀌어 보이게 합니다.
 export function ResultContent({ tone, count, attend, goal, reached, badges }: Props) {
   const above = tone === "above";
   const percent = Math.round((attend / goal) * 100);
 
   return (
-    <div className={`absolute inset-0 flex flex-col ${above ? "text-navy" : "text-cellar"}`}>
+    <div className={`absolute inset-0 flex flex-col ${above ? "text-navy" : "text-navy [text-shadow:0_1px_0_rgb(255_250_230/0.45)]"}`}>
       {/* 오른쪽 위는 눈금자의 목표 표시 자리라 비워 둡니다. */}
       <SiteHeader className="px-6 pt-6 pr-28 sm:px-10 sm:pt-8 sm:pr-32">
         {badges.map((badge) => (
@@ -32,12 +32,12 @@ export function ResultContent({ tone, count, attend, goal, reached, badges }: Pr
           {count}
         </motion.p>
         <p className="mt-4 text-2xl font-bold sm:text-4xl">명이 함께해요</p>
-        <div className="mt-4 h-8">
+        <div className="mt-5 h-11">
           <AnimatePresence mode="wait">
             {reached ? (
               <motion.p
                 key="reached"
-                className={`text-lg font-semibold sm:text-2xl ${above ? "text-gold-ink" : "text-cellar"}`}
+                className="rounded-full bg-navy px-5 py-2 text-base font-semibold text-champagne [text-shadow:none] sm:px-6 sm:text-xl"
                 initial={{ opacity: 0, y: 12 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 2.4, duration: 0.6 }}
@@ -47,7 +47,7 @@ export function ResultContent({ tone, count, attend, goal, reached, badges }: Pr
             ) : (
               <motion.p
                 key="progress"
-                className={`flex items-center gap-2 text-base sm:text-xl ${above ? "text-muted" : "text-cellar/75"}`}
+                className={`flex items-center gap-2 text-base sm:text-xl ${above ? "text-muted" : "text-navy/70"}`}
                 exit={{ opacity: 0, y: -8 }}
               >
                 목표 {goal}명 · {percent}%

@@ -175,7 +175,7 @@ export function RemoteView() {
           ))}
         </div>
         <button
-          className={`${wide} bg-champagne text-cellar shadow-[0_3px_0_var(--color-champagne-deep)] active:shadow-none`}
+          className={`${wide} bg-champagne text-navy shadow-[0_3px_0_var(--color-champagne-deep)] active:shadow-none`}
           onClick={fillToGoal}
           disabled={!stats || reached}
         >
