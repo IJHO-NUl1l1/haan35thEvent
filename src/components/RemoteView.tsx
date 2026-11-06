@@ -75,6 +75,12 @@ export function RemoteView() {
   const removeAll = () =>
     run("직접 추가한 인원 모두 뺌", (s) => shiftManual(s, -s.manual), () => post({ removeAll: true }));
 
+  // 참여 화면(/join)의 응답 버튼 잠금. 휴대폰들은 3초마다 집계를 받아 오면서 이 값을 같이 받아 바로 바뀝니다.
+  const toggleLock = () => {
+    const next = !stats?.locked;
+    run(next ? "응답 잠금" : "응답 잠금 해제", (s) => ({ ...s, locked: next }), () => post({ locked: next }));
+  };
+
   const reset = () => {
     if (!window.confirm("시민들이 직접 한 응답까지 모두 지워집니다. 정말 초기화할까요?")) return;
     run("전체 초기화", (s) => ({ ...s, attend: 0, decline: 0, manual: 0 }), () => send({ method: "DELETE" }));
@@ -87,6 +93,7 @@ export function RemoteView() {
   const attend = stats?.attend ?? 0;
   const goal = stats?.goal ?? 1;
   const manual = stats?.manual ?? 0;
+  const locked = !!stats?.locked;
   const reached = !!stats && attend >= goal;
   const percent = Math.min(100, Math.round((attend / goal) * 100));
 
@@ -161,6 +168,32 @@ export function RemoteView() {
               {notice.text}
             </span>
           )}
+        </div>
+      </section>
+
+      {/* 응답 잠금 */}
+      <section className={`${card} ${locked ? "border-navy/40 bg-navy/[0.06]" : ""}`}>
+        <div className="flex items-center justify-between gap-3">
+          <div className="min-w-0">
+            <SectionTitle color={locked ? "bg-navy" : "bg-navy/30"}>참여 화면 응답 잠금</SectionTitle>
+            <p className="mt-1 pl-3 text-xs text-muted">
+              {locked
+                ? "잠김 — 휴대폰에는 ‘응답이 마감되었어요’가 보입니다"
+                : "열림 — 휴대폰에서 응답할 수 있습니다"}
+            </p>
+          </div>
+          <button
+            role="switch"
+            aria-checked={locked}
+            aria-label="참여 화면 응답 잠금"
+            onClick={toggleLock}
+            disabled={!stats}
+            className={`relative h-9 w-16 shrink-0 rounded-full transition-colors disabled:opacity-35 ${locked ? "bg-navy" : "bg-navy/20"}`}
+          >
+            <span
+              className={`absolute left-1 top-1 size-7 rounded-full bg-white shadow transition-transform ${locked ? "translate-x-7" : ""}`}
+            />
+          </button>
         </div>
       </section>
 

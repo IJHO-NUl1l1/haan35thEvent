@@ -6,6 +6,9 @@ import { EVENT } from "@/config/event";
 import type { RsvpStats, RsvpStatus } from "./rsvp";
 
 const TABLE = "rsvp_responses";
+// 행사 설정(key/value). 지금은 응답 잠금(rsvp_locked) 하나만 씁니다.
+const SETTINGS_TABLE = "event_settings";
+const LOCKED_KEY = "rsvp_locked";
 
 const url = process.env.SUPABASE_URL;
 const secretKey = process.env.SUPABASE_SECRET_KEY;
@@ -16,7 +19,7 @@ const supabase = url && secretKey ? createClient(url, secretKey, { auth: { persi
 export const STORE_IS_MOCK = !supabase;
 
 // --- MOCK: 서버를 재시작하면 초기화됩니다. ---
-const globalForStore = globalThis as unknown as { __rsvpResponses?: Map<string, RsvpStatus> };
+const globalForStore = globalThis as unknown as { __rsvpResponses?: Map<string, RsvpStatus>; __rsvpLocked?: boolean };
 // 개발 중 HMR 로 모듈이 다시 로드돼도 데이터가 유지되도록 globalThis 에 둡니다.
 const mockResponses = (globalForStore.__rsvpResponses ??= new Map());
 
@@ -42,8 +45,32 @@ export async function getCounts() {
 }
 
 export async function getStats(): Promise<RsvpStats> {
-  const counts = await getCounts();
-  return { ...counts, goal: EVENT.goal.value, goalMock: EVENT.goal.mock, mock: STORE_IS_MOCK };
+  const [counts, locked] = await Promise.all([getCounts(), getLocked()]);
+  return { ...counts, goal: EVENT.goal.value, goalMock: EVENT.goal.mock, mock: STORE_IS_MOCK, locked };
+}
+
+// 응답 잠금 여부. 설정 테이블이 아직 없거나 읽기에 실패하면 잠기지 않은 것으로 봐서 집계 화면은 계속 동작합니다.
+export async function getLocked() {
+  if (supabase) {
+    const { data, error } = await supabase.from(SETTINGS_TABLE).select("value").eq("key", LOCKED_KEY).maybeSingle();
+    if (error) {
+      console.error(`[rsvp-store] ${SETTINGS_TABLE} 읽기 실패:`, error.message);
+      return false;
+    }
+    return data?.value === "true";
+  }
+  return globalForStore.__rsvpLocked ?? false;
+}
+
+export async function setLocked(locked: boolean) {
+  if (supabase) {
+    const { error } = await supabase
+      .from(SETTINGS_TABLE)
+      .upsert({ key: LOCKED_KEY, value: String(locked), updated_at: new Date().toISOString() }, { onConflict: "key" });
+    if (error) throw error;
+    return;
+  }
+  globalForStore.__rsvpLocked = locked;
 }
 
 export async function getResponse(voterId: string): Promise<RsvpStatus | null> {

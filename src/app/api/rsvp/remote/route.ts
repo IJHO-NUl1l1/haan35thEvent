@@ -6,6 +6,7 @@ import {
   countManualAttendees,
   getStats,
   removeManualAttendees,
+  setLocked,
 } from "@/lib/rsvp-store";
 
 const MAX_STEP = 1000;
@@ -23,10 +24,13 @@ export async function GET() {
 // { delta: n }       → n 명 추가 (음수면 직접 넣은 인원에서 n 명 빼기)
 // { fillToGoal: true } → 목표 인원까지 부족한 만큼 추가
 // { removeAll: true }  → 직접 넣은 인원 모두 빼기
+// { locked: true/false } → 참여 화면 응답 잠금 / 해제
 export async function POST(request: Request) {
   const body = await request.json().catch(() => null);
 
-  if (body?.fillToGoal) {
+  if (typeof body?.locked === "boolean") {
+    await setLocked(body.locked);
+  } else if (body?.fillToGoal) {
     const { attend, goal } = await getStats();
     if (goal > attend) await addMockAttendees(goal - attend);
   } else if (body?.removeAll) {

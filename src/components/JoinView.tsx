@@ -17,7 +17,9 @@ const showMockTools = MOCK_TOOLS_ENABLED || process.env.NODE_ENV === "developmen
 // QR 을 찍고 들어오는 모바일 화면. 참여/불참 응답 → 결과 화면.
 export function JoinView() {
   const myStatus = useSyncExternalStore(subscribeMyStatus, getMyStatus, () => null);
-  const { stats, mutate } = useRsvpStats(5000);
+  // 3초마다 집계를 다시 불러옵니다. 리모컨의 응답 잠금(stats.locked)도 이 값에 실려 와서 새로고침 없이 반영됩니다.
+  const { stats, mutate } = useRsvpStats(3000);
+  const locked = !!stats?.locked;
   // "응답 바꾸기"를 눌러 버튼을 다시 보고 있는 상태. 기존 응답(myStatus)은 그대로 둡니다.
   const [editing, setEditing] = useState(false);
   const [failed, setFailed] = useState(false);
@@ -66,7 +68,9 @@ export function JoinView() {
       <EventIntro page="join" className="mt-4" />
 
       <section className="mt-8 rounded-2xl border border-line bg-surface p-5 sm:p-6">
-        {myStatus && !editing ? (
+        {locked ? (
+          <Closed status={myStatus} />
+        ) : myStatus && !editing ? (
           <Result status={myStatus} onChange={() => setEditing(true)} />
         ) : (
           <div>
@@ -105,6 +109,28 @@ export function JoinView() {
       {/* 모바일에서는 고정 위치가 로고·버튼을 가려서 본문 아래에 둡니다. */}
       {showMockTools && <MockControls mutate={mutate} className="mx-auto mt-6" />}
     </main>
+  );
+}
+
+// 리모컨에서 응답을 잠갔을 때. 이미 응답한 분께는 그 응답을 그대로 보여 줍니다.
+function Closed({ status }: { status: RsvpStatus | null }) {
+  return (
+    <div className="text-center">
+      <div className="mx-auto grid size-12 place-items-center rounded-full bg-navy/[0.08] text-navy">
+        <svg viewBox="0 0 24 24" className="size-6" fill="none" stroke="currentColor" strokeWidth={2} aria-hidden>
+          <rect x="5" y="10.5" width="14" height="10" rx="2" />
+          <path d="M8 10.5V7.5a4 4 0 0 1 8 0v3" strokeLinecap="round" />
+        </svg>
+      </div>
+      <p className="mt-4 text-lg font-bold">응답이 마감되었어요</p>
+      <p className="mt-1 text-sm text-muted">
+        {status === "attend"
+          ? "‘응원으로 함께하기’로 응답해 주셨어요. 고맙습니다."
+          : status === "decline"
+            ? "응답해 주셔서 고맙습니다."
+            : "함께해 주신 모든 분께 감사드립니다."}
+      </p>
+    </div>
   );
 }
 

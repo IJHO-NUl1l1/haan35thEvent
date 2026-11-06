@@ -2,7 +2,6 @@
 
 import {
   animate,
-  AnimatePresence,
   motion,
   useMotionValue,
   useReducedMotion,
@@ -15,11 +14,15 @@ import { useRsvpStats } from "@/hooks/useRsvpStats";
 import { MockControls } from "../MockControls";
 import { Finale } from "./Finale";
 import { LiquidFill } from "./LiquidFill";
+import { type Reaction, Reactions } from "./Reactions";
 import { ResultContent } from "./ResultContent";
 
 const showMockTools = MOCK_TOOLS_ENABLED || process.env.NODE_ENV === "development";
 // 0명이어도 수면(물결)이 보이도록 최소 높이를 둡니다.
 const MIN_LEVEL = 0.04;
+// 인원이 늘 때 한 번에 띄우는 이모지 수 / 화면에 동시에 떠 있는 최대 수
+const MAX_BURST = 20;
+const MAX_ON_SCREEN = 60;
 
 const subscribeNothing = () => () => {};
 
@@ -75,22 +78,22 @@ export function ResultView() {
     return () => controls.stop();
   }, [attend, reached, reduceMotion, waveScale]);
 
-  // 새 참여자가 생기면 수면에서 "+N" 이 떠오릅니다. (렌더 중 이전 값과 비교해 상태를 맞추는 패턴)
+  // 새 참여자가 생기면 늘어난 인원만큼 💙·👍 가 화면 아래에서 떠오릅니다. (렌더 중 이전 값과 비교해 상태를 맞추는 패턴)
+  // 한 번에 많이 늘면(목표 채우기 등) 화면이 뒤덮이지 않게 최대 MAX_BURST 개까지만 띄웁니다.
   const [prevAttend, setPrevAttend] = useState<number | null>(null);
   // 초기화 후 같은 숫자 변화가 반복될 수 있어서, 키는 계속 증가하는 일련번호로 붙입니다.
-  const [floaters, setFloaters] = useState<{ nextId: number; list: { id: number; delta: number; left: number }[] }>({
-    nextId: 0,
-    list: [],
-  });
+  const [reactions, setReactions] = useState<{ nextId: number; list: Reaction[] }>({ nextId: 0, list: [] });
   if ((stats || preview !== null) && attend !== prevAttend) {
-    if (prevAttend !== null && attend > prevAttend) {
-      const delta = attend - prevAttend;
-      const left = 30 + ((attend * 17) % 40);
-      setFloaters(({ nextId, list }) => ({ nextId: nextId + 1, list: [...list, { id: nextId, delta, left }] }));
+    if (prevAttend !== null && attend > prevAttend && !reduceMotion) {
+      const burst = Math.min(attend - prevAttend, MAX_BURST);
+      setReactions(({ nextId, list }) => ({
+        nextId: nextId + burst,
+        list: [...list, ...Array.from({ length: burst }, (_, order) => ({ id: nextId + order, order }))].slice(-MAX_ON_SCREEN),
+      }));
     }
     setPrevAttend(attend);
   }
-  const removeFloater = (id: number) => setFloaters((s) => ({ ...s, list: s.list.filter((x) => x.id !== id) }));
+  const removeReaction = (id: number) => setReactions((s) => ({ ...s, list: s.list.filter((x) => x.id !== id) }));
 
   const badges = [
     ...(stats?.mock ? ["MOCK 데이터"] : []),
@@ -107,22 +110,7 @@ export function ResultView() {
         <ResultContent tone="below" {...contentProps} />
       </motion.div>
 
-      <AnimatePresence>
-        {!reduceMotion &&
-          floaters.list.map((f) => (
-            <motion.span
-              key={f.id}
-              className="pointer-events-none absolute rounded-full bg-navy px-3 py-1 text-lg font-bold text-champagne shadow-sm"
-              style={{ left: `${f.left}%`, bottom: `${fill * 100}%` }}
-              initial={{ opacity: 0, y: 0, scale: 0.8 }}
-              animate={{ opacity: [0, 1, 1, 0], y: -140, scale: 1 }}
-              transition={{ duration: 2, ease: "easeOut" }}
-              onAnimationComplete={() => removeFloater(f.id)}
-            >
-              +{f.delta}
-            </motion.span>
-          ))}
-      </AnimatePresence>
+      <Reactions list={reactions.list} onDone={removeReaction} />
 
       {reached && !reduceMotion && <Finale />}
 

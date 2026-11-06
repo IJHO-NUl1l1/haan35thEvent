@@ -8,6 +8,8 @@ export type RsvpStats = {
   goalMock: boolean;
   // 저장소가 mock 이면 true. 실제 DB 로 바꾸면 false 가 됩니다.
   mock: boolean;
+  // 리모컨에서 응답을 잠갔으면 true. 참여 화면은 이 값을 보고 버튼 대신 마감 안내를 보여줍니다.
+  locked: boolean;
 };
 
 export type MyResponse = { voterId: string | null; status: RsvpStatus | null };
