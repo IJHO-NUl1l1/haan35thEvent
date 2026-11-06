@@ -16,6 +16,7 @@ type Props = {
 // 차오르는 높이만큼 글자 느낌이 바뀌어 보이게 합니다.
 export function ResultContent({ tone, count, attend, goal, reached, badges }: Props) {
   const above = tone === "above";
+  const silver = above ? "" : "text-silver";
   const percent = Math.round((attend / goal) * 100);
 
   return (
@@ -27,22 +28,22 @@ export function ResultContent({ tone, count, attend, goal, reached, badges }: Pr
         ))}
       </SiteHeader>
 
-      {/* 샴페인 밖은 남색, 샴페인 속은 흰 글씨 + 금빛 그림자(라벨에 새긴 듯한 느낌)로 차오른 만큼 확실히 달라 보이게 합니다. */}
+      {/* 샴페인 밖은 남색, 샴페인 속은 은색 금속 글씨(globals.css 의 .text-silver)로 차오른 만큼 확실히 달라 보이게 합니다. */}
       <main
-        className={`flex flex-1 flex-col items-center justify-center px-6 pb-16 text-center ${
-          above ? "text-navy" : "text-white [text-shadow:0_1px_0_rgb(150_100_10/0.55),0_3px_14px_rgb(150_100_10/0.4)]"
-        }`}
+        className={`flex flex-1 flex-col items-center justify-center px-6 pb-16 text-center ${above ? "text-navy" : ""}`}
       >
-        <motion.p className="text-[clamp(7rem,26vmin,19rem)] font-extrabold leading-[0.85] tracking-[-0.05em] tabular-nums">
+        <motion.p
+          className={`text-[clamp(7rem,26vmin,19rem)] font-extrabold leading-[0.85] tracking-[-0.05em] tabular-nums ${silver}`}
+        >
           {count}
         </motion.p>
-        <p className="mt-4 text-2xl font-bold sm:text-4xl">명이 함께해요</p>
+        <p className={`mt-4 text-2xl font-bold sm:text-4xl ${silver}`}>명이 함께해요</p>
         <div className="mt-5 h-11">
           <AnimatePresence mode="wait">
             {reached ? (
               <motion.p
                 key="reached"
-                className="rounded-full bg-navy px-5 py-2 text-base font-semibold text-champagne [text-shadow:none] sm:px-6 sm:text-xl"
+                className="rounded-full bg-navy px-5 py-2 text-base font-semibold text-champagne sm:px-6 sm:text-xl"
                 initial={{ opacity: 0, y: 12 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 2.4, duration: 0.6 }}
@@ -52,7 +53,7 @@ export function ResultContent({ tone, count, attend, goal, reached, badges }: Pr
             ) : (
               <motion.p
                 key="progress"
-                className={`flex items-center gap-2 text-base sm:text-xl ${above ? "text-muted" : "text-white/95"}`}
+                className={`flex items-center gap-2 text-base sm:text-xl ${above ? "text-muted" : "text-silver-flat font-semibold"}`}
                 exit={{ opacity: 0, y: -8 }}
               >
                 목표 {goal}명 · {percent}%
