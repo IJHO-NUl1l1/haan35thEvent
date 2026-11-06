@@ -68,38 +68,68 @@ export function JoinView() {
       <EventIntro page="join" className="mt-4" />
 
       <section className="mt-8 rounded-2xl border border-line bg-surface p-5 sm:p-6">
-        {locked ? (
-          <Closed status={myStatus} />
-        ) : myStatus && !editing ? (
-          <Result status={myStatus} onChange={() => setEditing(true)} />
-        ) : (
-          <div>
-            <p className="text-lg font-bold">행사에 함께하시나요?</p>
-            {myStatus && (
-              <p className="mt-1 text-sm text-muted">
-                지금은 &lsquo;{myStatus === "attend" ? "참여" : "불참"}&rsquo;로 응답되어 있어요.{" "}
-                <button className="underline underline-offset-4" onClick={() => setEditing(false)}>
-                  그대로 두기
-                </button>
-              </p>
+        {/* 응답 칸은 높이를 고정해 두고 안의 내용만 바뀝니다. (버튼 ↔ 완료 ↔ 잠김 사이에서 아래 내용이 들썩이지 않게) */}
+        <div className="relative h-60">
+          {/* 잠겨 있으면 뒤의 버튼은 그대로 보이되 누를 수 없게 합니다. */}
+          <div inert={locked} className="flex h-full flex-col justify-center">
+            {myStatus && !editing ? (
+              <Result status={myStatus} onChange={() => setEditing(true)} />
+            ) : (
+              <div>
+                <p className="text-lg font-bold">행사에 함께하시나요?</p>
+                {myStatus && (
+                  <p className="mt-1 text-sm text-muted">
+                    지금은 &lsquo;{myStatus === "attend" ? "참여" : "불참"}&rsquo;로 응답되어 있어요.{" "}
+                    <button className="underline underline-offset-4" onClick={() => setEditing(false)}>
+                      그대로 두기
+                    </button>
+                  </p>
+                )}
+                <div className="mt-4 grid gap-2.5">
+                  <button
+                    className="h-14 rounded-xl bg-primary text-base font-bold text-white transition hover:bg-navy active:scale-[0.99]"
+                    onClick={() => respond("attend")}
+                  >
+                    응원으로 함께하기
+                  </button>
+                  <button
+                    className="h-14 rounded-xl border border-line-strong bg-paper text-base font-semibold text-ink transition hover:bg-navy/[0.04] active:scale-[0.99]"
+                    onClick={() => respond("decline")}
+                  >
+                    이번엔 어려워요
+                  </button>
+                </div>
+                {failed && <p className="mt-3 text-sm text-pink">전송하지 못했어요. 잠시 후 다시 눌러 주세요.</p>}
+              </div>
             )}
-            <div className="mt-4 grid gap-2.5">
-              <button
-                className="h-14 rounded-xl bg-primary text-base font-bold text-white transition hover:bg-navy active:scale-[0.99]"
-                onClick={() => respond("attend")}
-              >
-                응원으로 함께하기
-              </button>
-              <button
-                className="h-14 rounded-xl border border-line-strong bg-paper text-base font-semibold text-ink transition hover:bg-navy/[0.04] active:scale-[0.99]"
-                onClick={() => respond("decline")}
-              >
-                이번엔 어려워요
-              </button>
-            </div>
-            {failed && <p className="mt-3 text-sm text-pink">전송하지 못했어요. 잠시 후 다시 눌러 주세요.</p>}
           </div>
-        )}
+
+          {/* 리모컨에서 잠그면 반투명 레이어가 덮입니다. 풀면 사라지고 뒤의 화면이 그대로 이어집니다. */}
+          <div
+            aria-hidden={!locked}
+            className={`absolute -inset-2 grid place-items-center rounded-xl bg-surface/75 backdrop-blur-[3px] transition-opacity duration-300 ${
+              locked ? "opacity-100" : "pointer-events-none opacity-0"
+            }`}
+          >
+            <div className="text-center">
+              <div className="mx-auto grid size-12 place-items-center rounded-full bg-navy text-white shadow-md">
+                <svg
+                  viewBox="0 0 24 24"
+                  className="size-6"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth={2}
+                  aria-hidden
+                >
+                  <rect x="5" y="10.5" width="14" height="10" rx="2" />
+                  <path d="M8 10.5V7.5a4 4 0 0 1 8 0v3" strokeLinecap="round" />
+                </svg>
+              </div>
+              <p className="mt-3 text-lg font-bold">지금은 잠겨 있어요</p>
+              <p className="mt-1 text-sm text-muted">잠금이 풀리면 바로 응답할 수 있어요</p>
+            </div>
+          </div>
+        </div>
 
         <div className="mt-6 border-t border-line pt-5">
           <ProgressMeter stats={stats} />
@@ -109,28 +139,6 @@ export function JoinView() {
       {/* 모바일에서는 고정 위치가 로고·버튼을 가려서 본문 아래에 둡니다. */}
       {showMockTools && <MockControls mutate={mutate} className="mx-auto mt-6" />}
     </main>
-  );
-}
-
-// 리모컨에서 응답을 잠갔을 때. 이미 응답한 분께는 그 응답을 그대로 보여 줍니다.
-function Closed({ status }: { status: RsvpStatus | null }) {
-  return (
-    <div className="text-center">
-      <div className="mx-auto grid size-12 place-items-center rounded-full bg-navy/[0.08] text-navy">
-        <svg viewBox="0 0 24 24" className="size-6" fill="none" stroke="currentColor" strokeWidth={2} aria-hidden>
-          <rect x="5" y="10.5" width="14" height="10" rx="2" />
-          <path d="M8 10.5V7.5a4 4 0 0 1 8 0v3" strokeLinecap="round" />
-        </svg>
-      </div>
-      <p className="mt-4 text-lg font-bold">응답이 마감되었어요</p>
-      <p className="mt-1 text-sm text-muted">
-        {status === "attend"
-          ? "‘응원으로 함께하기’로 응답해 주셨어요. 고맙습니다."
-          : status === "decline"
-            ? "응답해 주셔서 고맙습니다."
-            : "함께해 주신 모든 분께 감사드립니다."}
-      </p>
-    </div>
   );
 }
 

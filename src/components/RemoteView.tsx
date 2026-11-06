@@ -178,7 +178,7 @@ export function RemoteView() {
             <SectionTitle color={locked ? "bg-navy" : "bg-navy/30"}>참여 화면 응답 잠금</SectionTitle>
             <p className="mt-1 pl-3 text-xs text-muted">
               {locked
-                ? "잠김 — 휴대폰에는 ‘응답이 마감되었어요’가 보입니다"
+                ? "잠김 — 휴대폰 응답 칸에 잠금 화면이 덮입니다"
                 : "열림 — 휴대폰에서 응답할 수 있습니다"}
             </p>
           </div>
