@@ -67,9 +67,9 @@ export function JoinView() {
       <EventTitle className="mt-10 text-[26px] font-bold leading-snug tracking-tight sm:text-3xl" />
       <EventIntro page="join" className="mt-4" />
 
-      <section className="mt-8 rounded-2xl border border-line bg-surface p-5 sm:p-6">
+      <section className="mt-8 rounded-2xl border border-line bg-surface p-4 sm:p-5">
         {/* 응답 칸은 높이를 고정해 두고 안의 내용만 바뀝니다. (버튼 ↔ 완료 ↔ 잠김 사이에서 아래 내용이 들썩이지 않게) */}
-        <div className="relative h-60">
+        <div className="relative h-52">
           {/* 잠겨 있으면 뒤의 버튼은 그대로 보이되 누를 수 없게 합니다. */}
           <div inert={locked} className="flex h-full flex-col justify-center">
             {myStatus && !editing ? (
@@ -77,13 +77,18 @@ export function JoinView() {
             ) : (
               <div>
                 <p className="text-lg font-bold">행사에 함께하시나요?</p>
-                {myStatus && (
-                  <p className="mt-1 text-sm text-muted">
-                    지금은 &lsquo;{myStatus === "attend" ? "참여" : "불참"}&rsquo;로 응답되어 있어요.{" "}
-                    <button className="underline underline-offset-4" onClick={() => setEditing(false)}>
-                      그대로 두기
-                    </button>
-                  </p>
+                {/* 전송 실패 안내는 같은 줄에 대신 띄워서 고정 높이를 넘지 않게 합니다. */}
+                {failed ? (
+                  <p className="mt-1 text-sm text-pink">전송하지 못했어요. 잠시 후 다시 눌러 주세요.</p>
+                ) : (
+                  myStatus && (
+                    <p className="mt-1 text-sm text-muted">
+                      지금은 &lsquo;{myStatus === "attend" ? "참여" : "불참"}&rsquo;로 응답되어 있어요.{" "}
+                      <button className="underline underline-offset-4" onClick={() => setEditing(false)}>
+                        그대로 두기
+                      </button>
+                    </p>
+                  )
                 )}
                 <div className="mt-4 grid gap-2.5">
                   <button
@@ -99,20 +104,19 @@ export function JoinView() {
                     이번엔 어려워요
                   </button>
                 </div>
-                {failed && <p className="mt-3 text-sm text-pink">전송하지 못했어요. 잠시 후 다시 눌러 주세요.</p>}
               </div>
             )}
           </div>
 
-          {/* 리모컨에서 잠그면 반투명 레이어가 덮입니다. 풀면 사라지고 뒤의 화면이 그대로 이어집니다. */}
+          {/* 리모컨에서 잠그면 유리판(globals.css 의 .liquid-glass)이 덮입니다. 풀면 사라지고 뒤의 화면이 그대로 이어집니다. */}
           <div
             aria-hidden={!locked}
-            className={`absolute -inset-2 grid place-items-center rounded-xl bg-surface/75 backdrop-blur-[3px] transition-opacity duration-300 ${
+            className={`liquid-glass absolute -inset-2 grid place-items-center rounded-2xl transition-opacity duration-300 ${
               locked ? "opacity-100" : "pointer-events-none opacity-0"
             }`}
           >
             <div className="text-center">
-              <div className="mx-auto grid size-12 place-items-center rounded-full bg-navy text-white shadow-md">
+              <div className="mx-auto grid size-12 place-items-center rounded-full bg-navy/90 text-white shadow-[0_6px_16px_rgb(13_42_82/0.3)]">
                 <svg
                   viewBox="0 0 24 24"
                   className="size-6"
@@ -125,13 +129,13 @@ export function JoinView() {
                   <path d="M8 10.5V7.5a4 4 0 0 1 8 0v3" strokeLinecap="round" />
                 </svg>
               </div>
-              <p className="mt-3 text-lg font-bold">지금은 잠겨 있어요</p>
-              <p className="mt-1 text-sm text-muted">잠금이 풀리면 바로 응답할 수 있어요</p>
+              <p className="mt-3 text-lg font-bold text-navy">지금은 잠겨 있어요</p>
+              <p className="mt-1 text-sm font-medium text-navy/70">잠금이 풀리면 바로 응답할 수 있어요</p>
             </div>
           </div>
         </div>
 
-        <div className="mt-6 border-t border-line pt-5">
+        <div className="mt-4 border-t border-line pt-4">
           <ProgressMeter stats={stats} />
         </div>
       </section>

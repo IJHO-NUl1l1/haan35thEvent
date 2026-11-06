@@ -41,6 +41,33 @@ body {
   100% { transform: translate3d(var(--drift, 0px), -100vh, 0); opacity: 0; }
 }
 
+/* 아이폰 Liquid Glass 느낌의 투명 유리판 (/join 응답 잠금).
+   뒤 화면을 살짝 흐리고 채도를 올려 비치게 하고, 밝은 테두리·안쪽 광·대각선 반사광으로 유리 두께를 표현합니다.
+   SVG 굴절 필터는 아이폰 Safari 에서 동작하지 않아 CSS 만으로 만듭니다. */
+.liquid-glass {
+  isolation: isolate;
+  overflow: hidden;
+  background: rgb(255 255 255 / 0.14);
+  -webkit-backdrop-filter: blur(7px) saturate(180%) brightness(1.04);
+  backdrop-filter: blur(7px) saturate(180%) brightness(1.04);
+  border: 1px solid rgb(255 255 255 / 0.7);
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 0.95),
+    inset 0 -1px 0 rgb(255 255 255 / 0.35),
+    inset 0 0 18px rgb(255 255 255 / 0.45),
+    0 10px 30px -8px rgb(13 42 82 / 0.22);
+}
+.liquid-glass::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background:
+    linear-gradient(135deg, rgb(255 255 255 / 0.55) 0%, rgb(255 255 255 / 0) 38%),
+    linear-gradient(315deg, rgb(255 255 255 / 0.3) 0%, rgb(255 255 255 / 0) 30%);
+}
+
 /* 리모컨(/remote) 버튼 누름 알림 */
 @keyframes pop-in {
   0% { transform: scale(0.85); opacity: 0; }
