@@ -8,7 +8,7 @@ import {
   useSpring,
   useTransform,
 } from "motion/react";
-import { useEffect, useState, useSyncExternalStore } from "react";
+import { useCallback, useEffect, useState, useSyncExternalStore } from "react";
 import { EVENT, MOCK_TOOLS_ENABLED } from "@/config/event";
 import { useRsvpStats } from "@/hooks/useRsvpStats";
 import { MockControls } from "../MockControls";
@@ -20,9 +20,9 @@ import { ResultContent } from "./ResultContent";
 const showMockTools = MOCK_TOOLS_ENABLED || process.env.NODE_ENV === "development";
 // 0명이어도 수면(물결)이 보이도록 최소 높이를 둡니다.
 const MIN_LEVEL = 0.04;
-// 인원이 늘 때 한 번에 띄우는 이모지 수 / 화면에 동시에 떠 있는 최대 수
-const MAX_BURST = 20;
-const MAX_ON_SCREEN = 60;
+// 인원이 늘 때 한 번에 터뜨리는 반응 수 / 화면에 동시에 떠 있는 최대 수
+const MAX_BURST = 12;
+const MAX_ON_SCREEN = 30;
 
 const subscribeNothing = () => () => {};
 
@@ -78,8 +78,8 @@ export function ResultView() {
     return () => controls.stop();
   }, [attend, reached, reduceMotion, waveScale]);
 
-  // 새 참여자가 생기면 늘어난 인원만큼 💙·👍 가 화면 아래에서 떠오릅니다. (렌더 중 이전 값과 비교해 상태를 맞추는 패턴)
-  // 한 번에 많이 늘면(목표 채우기 등) 화면이 뒤덮이지 않게 최대 MAX_BURST 개까지만 띄웁니다.
+  // 새 참여자가 생기면 늘어난 인원만큼 하트·따봉이 화면 곳곳에서 인스타 하트처럼 터집니다. (렌더 중 이전 값과 비교해 상태를 맞추는 패턴)
+  // 한 번에 많이 늘면(목표 채우기 등) 화면이 뒤덮이지 않게 최대 MAX_BURST 번까지만 띄웁니다.
   const [prevAttend, setPrevAttend] = useState<number | null>(null);
   // 초기화 후 같은 숫자 변화가 반복될 수 있어서, 키는 계속 증가하는 일련번호로 붙입니다.
   const [reactions, setReactions] = useState<{ nextId: number; list: Reaction[] }>({ nextId: 0, list: [] });
@@ -93,7 +93,10 @@ export function ResultView() {
     }
     setPrevAttend(attend);
   }
-  const removeReaction = (id: number) => setReactions((s) => ({ ...s, list: s.list.filter((x) => x.id !== id) }));
+  const removeReaction = useCallback(
+    (id: number) => setReactions((s) => ({ ...s, list: s.list.filter((x) => x.id !== id) })),
+    [],
+  );
 
   const badges = [
     ...(stats?.mock ? ["MOCK 데이터"] : []),

@@ -1,13 +1,13 @@
 "use client";
 
 import { motion } from "motion/react";
+import { useEffect, useId } from "react";
 
-// 새 참여자가 생기면 인스타그램 라이브 하트처럼 이모지가 화면 아래에서 둥실둥실 올라갑니다.
-// 움직임: ① 톡 튀어나옴(0 → 125% → 100%) ② 위로 길게 떠오르며 끝에서 살짝 느려짐
-//        ③ 좌우로 부드럽게 S자로 흔들리며 같이 기울어짐 ④ 대부분 선명하다가 마지막 30% 동안 사라짐
-// 하나하나 크기·속도·흔들림·출발 위치가 달라서 여러 개가 연달아 나와도 자연스러운 흐름처럼 보입니다.
-export const REACTION_EMOJIS = ["💙", "👍"];
-
+// 새 참여자가 생기면 인스타그램에서 하트를 눌렀을 때처럼 반응이 터집니다. (참여자 한 명 = 한 번)
+// ① 그 자리에 큰 하트(또는 따봉)가 톡 튀어나와(0 → 125% → 100%) 잠깐 머물다 사라지고
+// ② 동시에 그보다 작고 연한 잔상 몇 개가 같은 자리에서 위로 쇽쇽쇽 떠오릅니다.
+//    잔상마다 출발 시간(살짝 텀), 기울기, 투명도, 올라가는 높이가 조금씩 다릅니다.
+// 시스템 이모지는 기기마다 모양이 다르고(윈도우는 굵은 테두리) 쨍해서, 부드러운 그라데이션 SVG 아이콘을 씁니다.
 export type Reaction = { id: number; order: number };
 
 // 같은 id 는 항상 같은 값을 내는 의사 난수 (렌더 중에 Math.random 을 쓰지 않기 위해)
@@ -16,50 +16,146 @@ function rand(id: number, salt: number) {
   return x - Math.floor(x);
 }
 
+const MAIN_DURATION = 1.5;
+
 function shape(id: number, order: number) {
+  const ghostCount = 3 + Math.floor(rand(id, 9) * 3); // 잔상 3~5개
+  const ghosts = Array.from({ length: ghostCount }, (_, i) => ({
+    delay: 0.12 + i * (0.11 + rand(id, 20 + i) * 0.07), // 쇽, 쇽, 쇽 — 간격도 조금씩 다르게
+    angle: (rand(id, 30 + i) - 0.5) * 44, // -22° ~ 22°
+    opacity: 0.35 + rand(id, 40 + i) * 0.35, // 0.35 ~ 0.7
+    rise: 90 + rand(id, 50 + i) * 110, // 90 ~ 200px
+    drift: (rand(id, 60 + i) - 0.5) * 60,
+    scale: 0.55 + rand(id, 70 + i) * 0.25,
+    duration: 1.1 + rand(id, 80 + i) * 0.4,
+  }));
+  const end = Math.max(MAIN_DURATION, ...ghosts.map((g) => g.delay + g.duration));
   return {
-    emoji: REACTION_EMOJIS[id % REACTION_EMOJIS.length],
-    left: 6 + rand(id, 1) * 88, // 화면 가로 6~94%
-    size: 6 + rand(id, 2) * 4.5, // 6~10.5vmin
-    rise: 62 + rand(id, 3) * 26, // 화면 높이의 62~88% 만큼 올라감
-    sway: (18 + rand(id, 4) * 32) * (rand(id, 5) > 0.5 ? 1 : -1), // 첫 흔들림 방향도 제각각
-    duration: 3.2 + rand(id, 6) * 1.6,
-    delay: order * 0.11 + rand(id, 7) * 0.08, // 한 번에 여러 명이면 쇽쇽쇽 이어서
+    icon: id % 2 === 0 ? Heart : ThumbsUp,
+    left: 8 + rand(id, 1) * 84, // 화면 가로 8~92%
+    top: 22 + rand(id, 2) * 62, // 화면 세로 22~84%
+    size: 5.4 + rand(id, 3) * 3, // 5.4~8.4vmin
+    tilt: (rand(id, 4) - 0.5) * 16,
+    delay: order * 0.16 + rand(id, 5) * 0.1, // 한 번에 여러 명이면 여기저기서 차례로
+    ghosts,
+    end,
   };
 }
 
 export function Reactions({ list, onDone }: { list: Reaction[]; onDone: (id: number) => void }) {
   return (
     <div className="pointer-events-none absolute inset-0 z-10 overflow-hidden" aria-hidden>
-      {list.map(({ id, order }) => {
-        const r = shape(id, order);
-        const base = { duration: r.duration, delay: r.delay };
-        return (
-          <motion.span
-            key={id}
-            className="absolute bottom-0 -translate-x-1/2 leading-none drop-shadow-[0_6px_10px_rgb(13_42_82/0.25)]"
-            style={{ left: `${r.left}%`, fontSize: `${r.size}vmin` }}
-            initial={{ y: "0vh", scale: 0, opacity: 0 }}
-            animate={{
-              y: ["0vh", `-${r.rise}vh`],
-              x: [0, r.sway, -r.sway, r.sway * 0.6, -r.sway * 0.3],
-              rotate: [0, r.sway * 0.3, -r.sway * 0.3, r.sway * 0.18, 0],
-              scale: [0, 1.25, 1, 1],
-              opacity: [0, 1, 1, 0],
-            }}
-            transition={{
-              y: { ...base, ease: [0.2, 0.6, 0.4, 1] },
-              x: { ...base, ease: "easeInOut" },
-              rotate: { ...base, ease: "easeInOut" },
-              scale: { ...base, times: [0, 0.08, 0.14, 1], ease: "easeOut" },
-              opacity: { ...base, times: [0, 0.05, 0.7, 1] },
-            }}
-            onAnimationComplete={() => onDone(id)}
-          >
-            {r.emoji}
-          </motion.span>
-        );
-      })}
+      {list.map(({ id, order }) => (
+        <Burst key={id} id={id} order={order} onDone={onDone} />
+      ))}
     </div>
+  );
+}
+
+function Burst({ id, order, onDone }: Reaction & { onDone: (id: number) => void }) {
+  const r = shape(id, order);
+  const Icon = r.icon;
+
+  // 가장 늦게 끝나는 잔상까지 다 사라진 뒤 목록에서 지웁니다.
+  const total = r.delay + r.end;
+  useEffect(() => {
+    const timer = setTimeout(() => onDone(id), total * 1000 + 100);
+    return () => clearTimeout(timer);
+  }, [id, total, onDone]);
+
+  return (
+    // 크기 0 인 기준점. 큰 아이콘과 잔상이 모두 여기서 출발합니다.
+    <div className="absolute" style={{ left: `${r.left}%`, top: `${r.top}%` }}>
+      {r.ghosts.map((g, i) => (
+        <motion.div
+          key={i}
+          className="absolute -translate-x-1/2 -translate-y-1/2"
+          style={{ width: `${r.size}vmin` }}
+          initial={{ opacity: 0, scale: g.scale * 0.6, y: 0, x: 0, rotate: 0 }}
+          animate={{
+            opacity: [0, g.opacity, g.opacity, 0],
+            scale: g.scale,
+            y: -g.rise,
+            x: g.drift,
+            rotate: g.angle,
+          }}
+          transition={{
+            duration: g.duration,
+            delay: r.delay + g.delay,
+            ease: [0.25, 0.7, 0.4, 1],
+            opacity: {
+              duration: g.duration,
+              delay: r.delay + g.delay,
+              times: [0, 0.15, 0.55, 1],
+            },
+          }}
+        >
+          <Icon />
+        </motion.div>
+      ))}
+      <motion.div
+        className="absolute -translate-x-1/2 -translate-y-1/2 drop-shadow-[0_6px_12px_rgb(13_42_82/0.18)]"
+        style={{ width: `${r.size}vmin`, rotate: r.tilt }}
+        initial={{ opacity: 0, scale: 0 }}
+        animate={{ opacity: [0, 1, 1, 0], scale: [0, 1.25, 0.95, 1, 1, 0.85] }}
+        transition={{
+          duration: MAIN_DURATION,
+          delay: r.delay,
+          opacity: {
+            duration: MAIN_DURATION,
+            delay: r.delay,
+            times: [0, 0.08, 0.72, 1],
+          },
+          scale: {
+            duration: MAIN_DURATION,
+            delay: r.delay,
+            times: [0, 0.14, 0.24, 0.32, 0.72, 1],
+            ease: "easeOut",
+          },
+        }}
+      >
+        <Icon />
+      </motion.div>
+    </div>
+  );
+}
+
+// 분홍과 빨강 사이의 부드러운 하트. 위쪽이 살짝 밝은 그라데이션 + 옅은 광택.
+function Heart() {
+  const gid = useId();
+  return (
+    <svg viewBox="0 0 24 24" className="block h-auto w-full">
+      <defs>
+        <linearGradient id={gid} x1="0.2" y1="0" x2="0.8" y2="1">
+          <stop offset="0" stopColor="#ff8da4" />
+          <stop offset="1" stopColor="#ec4a6e" />
+        </linearGradient>
+      </defs>
+      <path
+        d="M12 21.2s-7.6-4.5-9.7-9.3C.8 8.3 3 4.4 6.7 4.4c2.1 0 3.6 1.2 5.3 3.2 1.7-2 3.2-3.2 5.3-3.2 3.7 0 5.9 3.9 4.4 7.5-2.1 4.8-9.7 9.3-9.7 9.3z"
+        fill={`url(#${gid})`}
+      />
+      <ellipse cx="7.3" cy="8.4" rx="2.1" ry="1.3" fill="#fff" opacity="0.35" transform="rotate(-35 7.3 8.4)" />
+    </svg>
+  );
+}
+
+// 하트와 어울리는 부드러운 하늘색 따봉. 결과 화면의 파랑(진행) 계열.
+function ThumbsUp() {
+  const gid = useId();
+  return (
+    <svg viewBox="0 0 24 24" className="block h-auto w-full">
+      <defs>
+        <linearGradient id={gid} x1="0.2" y1="0" x2="0.8" y2="1">
+          <stop offset="0" stopColor="#8fd0f5" />
+          <stop offset="1" stopColor="#3f9bdc" />
+        </linearGradient>
+      </defs>
+      <g fill={`url(#${gid})`} stroke={`url(#${gid})`} strokeWidth="1.2" strokeLinejoin="round">
+        <rect x="2.6" y="10.2" width="4.2" height="10.4" rx="1.4" />
+        <path d="M8.6 10.3 11.7 4.5c.5-.9 1.6-1.2 2.4-.7.9.5 1.2 1.6.8 2.5L13.8 9.1H19c1.4 0 2.4 1.3 2.1 2.6l-1.5 6.9c-.2 1.2-1.3 2.1-2.6 2.1H8.6z" />
+      </g>
+      <ellipse cx="14.6" cy="11.6" rx="2.6" ry="1.1" fill="#fff" opacity="0.3" />
+    </svg>
   );
 }
