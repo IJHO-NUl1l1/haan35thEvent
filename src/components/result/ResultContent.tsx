@@ -19,7 +19,7 @@ export function ResultContent({ tone, count, attend, goal, reached, badges }: Pr
   const percent = Math.round((attend / goal) * 100);
 
   return (
-    <div className={`absolute inset-0 flex flex-col ${above ? "text-navy" : "text-navy [text-shadow:0_1px_0_rgb(255_250_230/0.45)]"}`}>
+    <div className="absolute inset-0 flex flex-col">
       {/* 오른쪽 위는 눈금자의 목표 표시 자리라 비워 둡니다. */}
       <SiteHeader className="px-6 pt-6 pr-28 sm:px-10 sm:pt-8 sm:pr-32">
         {badges.map((badge) => (
@@ -27,7 +27,12 @@ export function ResultContent({ tone, count, attend, goal, reached, badges }: Pr
         ))}
       </SiteHeader>
 
-      <main className="flex flex-1 flex-col items-center justify-center px-6 pb-16 text-center">
+      {/* 샴페인 밖은 남색, 샴페인 속은 흰 글씨 + 금빛 그림자(라벨에 새긴 듯한 느낌)로 차오른 만큼 확실히 달라 보이게 합니다. */}
+      <main
+        className={`flex flex-1 flex-col items-center justify-center px-6 pb-16 text-center ${
+          above ? "text-navy" : "text-white [text-shadow:0_1px_0_rgb(150_100_10/0.55),0_3px_14px_rgb(150_100_10/0.4)]"
+        }`}
+      >
         <motion.p className="text-[clamp(7rem,26vmin,19rem)] font-extrabold leading-[0.85] tracking-[-0.05em] tabular-nums">
           {count}
         </motion.p>
@@ -47,7 +52,7 @@ export function ResultContent({ tone, count, attend, goal, reached, badges }: Pr
             ) : (
               <motion.p
                 key="progress"
-                className={`flex items-center gap-2 text-base sm:text-xl ${above ? "text-muted" : "text-navy/70"}`}
+                className={`flex items-center gap-2 text-base sm:text-xl ${above ? "text-muted" : "text-white/95"}`}
                 exit={{ opacity: 0, y: -8 }}
               >
                 목표 {goal}명 · {percent}%
