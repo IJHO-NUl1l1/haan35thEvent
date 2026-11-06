@@ -49,7 +49,7 @@ export async function celebrateDisplay() {
 }
 
 // 결과 화면(/result) 목표 달성 시 한 번: 샴페인 코르크가 터지듯 중앙 아래에서 금빛 조각이 솟구치고,
-// 이어서 위에서 작은 금가루가 천천히 흩날립니다.
+// 이어서 화면 위쪽 여러 곳에서 금빛 별이 펑펑 터집니다.
 export async function champagnePop() {
   const confetti = await loadConfetti();
   const compact = isCompact();
@@ -67,20 +67,36 @@ export async function champagnePop() {
     origin: { x: 0.5, y: 1 },
   });
 
-  setTimeout(() => {
-    confetti({
-      ...base,
-      particleCount: compact ? 60 : 140,
-      spread: 180,
-      startVelocity: 12,
-      gravity: 0.35,
-      drift: 0.3,
-      ticks: 400,
-      scalar: compact ? 0.6 : 0.85,
-      shapes: ["star", "circle"],
-      origin: { x: 0.5, y: -0.05 },
-    });
-  }, 700);
+  // 화면 위쪽 여러 지점에서 별이 사방으로 펑펑 터진 뒤 천천히 내려옵니다. (가운데 → 바깥 순서로 번지듯)
+  const bursts = compact
+    ? [
+        { x: 0.5, y: 0.3 },
+        { x: 0.2, y: 0.22 },
+        { x: 0.8, y: 0.22 },
+      ]
+    : [
+        { x: 0.5, y: 0.28 },
+        { x: 0.28, y: 0.2 },
+        { x: 0.72, y: 0.2 },
+        { x: 0.1, y: 0.35 },
+        { x: 0.9, y: 0.35 },
+      ];
+  bursts.forEach((origin, i) => {
+    setTimeout(() => {
+      confetti({
+        ...base,
+        particleCount: compact ? 45 : 90,
+        spread: 360,
+        startVelocity: compact ? 28 : 40,
+        decay: 0.92,
+        gravity: 0.45,
+        ticks: 320,
+        scalar: compact ? 0.9 : 1.3,
+        shapes: ["star"],
+        origin,
+      });
+    }, 650 + i * 160);
+  });
 }
 
 // 참여 버튼을 눌렀을 때 작은 한 번.
