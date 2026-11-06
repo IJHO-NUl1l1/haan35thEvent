@@ -91,11 +91,11 @@ export function RemoteView() {
   const percent = Math.min(100, Math.round((attend / goal) * 100));
 
   const plus =
-    "h-14 rounded-xl bg-white text-lg font-bold text-paper shadow-[0_3px_0_rgb(13_42_82/0.45)] transition-transform active:translate-y-0.5 active:shadow-none disabled:opacity-35";
+    "h-14 rounded-xl bg-primary text-lg font-bold text-white shadow-[0_3px_0_var(--color-navy)] transition-transform active:translate-y-0.5 active:shadow-none disabled:opacity-35";
   const minus =
-    "h-14 rounded-xl border border-white/30 bg-white/[0.04] text-lg font-bold text-white transition-transform active:scale-95 active:bg-white/10 disabled:opacity-35";
+    "h-14 rounded-xl border border-line-strong bg-paper text-lg font-bold text-ink transition-transform active:scale-95 active:bg-navy/[0.06] disabled:opacity-35";
   const wide = "h-12 w-full rounded-xl text-base font-semibold active:scale-[0.98] transition-transform disabled:opacity-35";
-  const card = "flex flex-col gap-3 rounded-2xl border border-line bg-deep/70 p-3.5";
+  const card = "flex flex-col gap-3 rounded-2xl border border-line bg-surface p-3.5";
 
   return (
     <main className="mx-auto flex min-h-dvh w-full max-w-md flex-col gap-3 bg-paper px-4 pb-10 pt-5 text-ink select-none">
@@ -106,7 +106,7 @@ export function RemoteView() {
       {/* 현재 인원 */}
       <section className="sticky top-0 z-10 -mx-4 bg-paper px-4 pt-2">
         <div
-          className={`overflow-hidden rounded-2xl bg-navy shadow-lg shadow-navy/40 ring-1 transition-colors ${reached ? "ring-signal/70" : "ring-line"}`}
+          className={`overflow-hidden rounded-2xl bg-navy shadow-lg shadow-navy/25 ring-1 transition-colors ${reached ? "ring-signal" : "ring-navy"}`}
         >
           {/* 심볼 네 가지 색 띠 */}
           <div className="flex h-1" aria-hidden>
@@ -118,7 +118,7 @@ export function RemoteView() {
           <div className="p-4">
             <div className="flex items-end justify-between gap-3">
               <div>
-                <p className="text-sm font-semibold text-muted">{reached ? "목표 달성!" : "함께하기로 한 이웃"}</p>
+                <p className="text-sm font-semibold text-white/65">{reached ? "목표 달성!" : "함께하기로 한 이웃"}</p>
                 <p className={`mt-1 text-2xl font-bold tabular-nums ${reached ? "text-signal" : "text-brand"}`}>
                   {stats ? percent : "–"}
                   <span className="text-base">%</span>
@@ -131,20 +131,20 @@ export function RemoteView() {
                 >
                   {stats ? attend : "–"}
                 </span>
-                <span className="text-lg text-muted">/ {stats ? goal : "–"}명</span>
+                <span className="text-lg text-white/65">/ {stats ? goal : "–"}명</span>
               </p>
             </div>
             <div className="mt-4 h-3 overflow-hidden rounded-full bg-white/10">
               <div
-                className={`h-full rounded-full transition-[width] duration-500 ease-out ${reached ? "bg-signal" : "bg-linear-to-r from-brand to-water"}`}
+                className={`h-full rounded-full transition-[width] duration-500 ease-out ${reached ? "bg-signal" : "bg-linear-to-r from-brand to-teal"}`}
                 style={{ width: `${percent}%` }}
               />
             </div>
             <div className="mt-3 grid grid-cols-2 gap-2 text-sm tabular-nums">
-              <p className="flex justify-between rounded-lg bg-white/[0.06] px-3 py-2 text-muted">
+              <p className="flex justify-between rounded-lg bg-white/[0.08] px-3 py-2 text-white/65">
                 QR 응답 <b className="text-white">{stats ? attend - manual : "–"}명</b>
               </p>
-              <p className="flex justify-between rounded-lg bg-white/[0.06] px-3 py-2 text-muted">
+              <p className="flex justify-between rounded-lg bg-white/[0.08] px-3 py-2 text-white/65">
                 직접 추가 <b className="text-white">{stats ? manual : "–"}명</b>
               </p>
             </div>
@@ -155,7 +155,7 @@ export function RemoteView() {
             <span
               key={noticeKey}
               className={`animate-pop rounded-full px-3 py-1 text-sm font-semibold ${
-                notice.error ? "bg-pink/15 text-pink ring-1 ring-pink/50" : "bg-signal/15 text-signal"
+                notice.error ? "bg-pink/15 text-pink ring-1 ring-pink/50" : "bg-signal/20 text-signal-ink"
               }`}
             >
               {notice.text}
@@ -175,7 +175,7 @@ export function RemoteView() {
           ))}
         </div>
         <button
-          className={`${wide} bg-signal text-navy shadow-[0_3px_0_rgb(13_42_82/0.45)] active:shadow-none`}
+          className={`${wide} bg-signal text-navy shadow-[0_3px_0_#7fa41f] active:shadow-none`}
           onClick={fillToGoal}
           disabled={!stats || reached}
         >
@@ -185,7 +185,7 @@ export function RemoteView() {
 
       {/* 빼기 */}
       <section className={card}>
-        <SectionTitle color="bg-white/50" note="직접 추가한 인원에서만 빠집니다">
+        <SectionTitle color="bg-navy/30" note="직접 추가한 인원에서만 빠집니다">
           인원 빼기
         </SectionTitle>
         <div className="grid grid-cols-4 gap-2">
@@ -195,7 +195,7 @@ export function RemoteView() {
             </button>
           ))}
         </div>
-        <button className={`${wide} border border-white/30 text-white`} onClick={removeAll} disabled={manual === 0}>
+        <button className={`${wide} border border-line-strong bg-paper text-ink`} onClick={removeAll} disabled={manual === 0}>
           직접 추가한 인원 모두 빼기
         </button>
       </section>
@@ -213,7 +213,7 @@ export function RemoteView() {
               placeholder="인원 수"
               value={amount}
               onChange={(e) => setAmount(e.target.value)}
-              className="h-14 w-full appearance-none rounded-xl [-moz-appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none border border-white/30 bg-white/[0.07] pl-4 pr-10 text-xl font-bold text-white tabular-nums placeholder:text-base placeholder:font-normal placeholder:text-muted focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand/40"
+              className="h-14 w-full appearance-none rounded-xl [-moz-appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none border border-line-strong bg-paper pl-4 pr-10 text-xl font-bold text-ink tabular-nums placeholder:text-base placeholder:font-normal placeholder:text-muted focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand/40"
             />
             <span className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-base text-muted">명</span>
           </label>
@@ -227,9 +227,9 @@ export function RemoteView() {
       </section>
 
       {/* 초기화 */}
-      <section className="mt-6 flex flex-col gap-2 rounded-2xl border border-dashed border-pink/40 p-3.5">
+      <section className="mt-6 flex flex-col gap-2 rounded-2xl border border-dashed border-pink/50 p-3.5">
         <p className="text-xs text-muted">QR로 들어온 시민 응답까지 모두 지워집니다. 행사 중에는 누르지 마세요.</p>
-        <button className={`${wide} border border-pink/70 bg-pink/10 text-pink active:bg-pink/20`} onClick={reset}>
+        <button className={`${wide} border border-pink/70 bg-pink/[0.06] text-pink active:bg-pink/15`} onClick={reset}>
           전체 초기화 (QR 응답 포함)
         </button>
       </section>
@@ -239,7 +239,7 @@ export function RemoteView() {
 
 function SectionTitle({ color, note, children }: { color: string; note?: string; children: ReactNode }) {
   return (
-    <h2 className="flex items-center gap-2 text-sm font-semibold text-white">
+    <h2 className="flex items-center gap-2 text-sm font-semibold text-ink">
       <span className={`h-4 w-1 rounded-full ${color}`} aria-hidden />
       {children}
       {note && <span className="font-normal text-muted">· {note}</span>}

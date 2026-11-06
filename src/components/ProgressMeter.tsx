@@ -17,7 +17,7 @@ export function ProgressMeter({ stats, size = "md" }: Props) {
           {reached ? "목표 인원 달성! 함께해 주셔서 감사합니다" : "함께하기로 한 이웃"}
         </p>
         <p className="flex items-baseline gap-1 tabular-nums">
-          <span className={`font-bold ${reached ? "text-signal" : "text-white"} ${lg ? "text-4xl sm:text-5xl" : "text-2xl"}`}>
+          <span className={`font-bold ${reached ? "text-signal-ink" : "text-ink"} ${lg ? "text-4xl sm:text-5xl" : "text-2xl"}`}>
             {stats ? attend : "–"}
           </span>
           <span className={`text-muted ${lg ? "text-lg" : "text-sm"}`}>/ {stats ? goal : "–"}명</span>
@@ -25,7 +25,7 @@ export function ProgressMeter({ stats, size = "md" }: Props) {
         </p>
       </div>
       <div
-        className={`mt-3 overflow-hidden rounded-full bg-white/15 ${lg ? "h-3.5" : "h-2.5"}`}
+        className={`mt-3 overflow-hidden rounded-full bg-navy/10 ${lg ? "h-3.5" : "h-2.5"}`}
         role="progressbar"
         aria-valuemin={0}
         aria-valuemax={goal}

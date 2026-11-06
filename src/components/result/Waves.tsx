@@ -12,9 +12,9 @@ function wavePath(amplitude: number, wavelength: number) {
 }
 
 const LAYERS = [
-  { amplitude: 14, wavelength: 800, duration: 11, reverse: false, className: "fill-water opacity-30" },
-  { amplitude: 10, wavelength: 600, duration: 7, reverse: true, className: "fill-water opacity-55" },
-  { amplitude: 7, wavelength: 400, duration: 5, reverse: false, className: "fill-water" },
+  { amplitude: 14, wavelength: 800, duration: 11, reverse: false, className: "fill-champagne opacity-30" },
+  { amplitude: 10, wavelength: 600, duration: 7, reverse: true, className: "fill-champagne opacity-55" },
+  { amplitude: 7, wavelength: 400, duration: 5, reverse: false, className: "fill-champagne" },
 ];
 
 // 수면 위의 물결 여러 겹. scale 로 출렁임 세기를 조절합니다 (새 참여자 반응, 가득 찼을 때 잔잔하게).

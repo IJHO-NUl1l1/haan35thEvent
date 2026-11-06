@@ -2,22 +2,27 @@
 @import "tailwindcss";
 
 /* 색상 토큰. 하안종합사회복지관 Signal Light 로고에서 뽑은 색입니다.
-   paper = 바탕(로고 배경과 같은 파랑), ink = 바탕 위 글자, brand = 하늘(심볼), signal = 라임(심볼, 달성/강조) */
+   paper = 흰 바탕, surface = 옅은 파랑 판(카드·하단 띠), ink = 글자(검정 계열), primary = 로고 바탕 파랑(주 버튼),
+   brand = 하늘(심볼), signal = 라임(심볼, 달성/강조. 글자로 쓸 땐 signal-ink) */
 @theme {
-  --color-paper: #194886;
-  --color-deep: #12386b;
+  --color-paper: #ffffff;
+  --color-surface: #f1f5fb;
   --color-navy: #0d2a52;
-  --color-ink: #ffffff;
-  --color-muted: #c3d3ec;
-  --color-line: rgb(255 255 255 / 0.16);
+  --color-primary: #194886;
+  --color-ink: #191f28;
+  --color-muted: #5b6577;
+  --color-line: rgb(13 42 82 / 0.12);
+  --color-line-strong: rgb(13 42 82 / 0.22);
   --color-brand: #14a8e2;
-  --color-brand-soft: rgb(20 168 226 / 0.2);
-  /* 결과 화면(/result)에서 차오르는 물. brand 보다 밝게 해서 물속 남색 글자가 잘 보이게 함 */
-  --color-water: #5ccbf4;
-  --color-water-deep: #26aee6;
   --color-signal: #aed843;
-  --color-pink: #f23188;
+  --color-signal-ink: #5b8a10;
+  --color-pink: #e0267c;
   --color-teal: #11c0b1;
+  /* 결과 화면(/result)에서 차오르는 샴페인. 위는 밝은 거품색, 아래로 갈수록 진한 금색 */
+  --color-champagne: #f4dc94;
+  --color-champagne-deep: #d6a541;
+  --color-gold-ink: #9a6a10; /* 흰 바탕 위 금색 글자 */
+  --color-cellar: #4a3208; /* 샴페인 속 글자 */
   --font-sans: "Pretendard Variable", Pretendard, -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
 }
 

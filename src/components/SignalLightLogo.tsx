@@ -3,7 +3,7 @@ import Image from "next/image";
 // "온(ON)동네 복지안전망 Signal Light" 로고. 받은 시안(227×68px)의 치수·색을 그대로 옮겼습니다. (배경색 없이 사용)
 // 모든 치수는 시안 픽셀값을 em 으로 적어 두었고, 바깥에서 font-size 로 배율을 정합니다.
 // 예) text-[1px] = 시안 원본 크기, text-[1.5px] = 1.5배
-// sub/main = 기본(파란 바탕용) 색. tone="navy" 는 밝은 바탕(결과 화면의 물 속)에서 쓰는 남색 글자.
+// tone="navy"(기본) = 흰 바탕용 남색 글자, tone="light" = 파란 바탕용 흰 글자.
 const LINES = [
   { text: "온(ON)동네 복지안전망", top: 5.5, size: 11.8, spacing: 0, weight: "", main: false },
   { text: "Signal Light", top: 22.5, size: 19, spacing: 0, weight: "font-bold", main: true },
@@ -17,7 +17,7 @@ const COLORS = {
 
 export function SignalLightLogo({
   className = "text-[1px]",
-  tone = "light",
+  tone = "navy",
 }: {
   className?: string;
   tone?: "light" | "navy";

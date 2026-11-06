@@ -3,10 +3,10 @@ const MARKS = [0.25, 0.5, 0.75, 1];
 
 export function Scale({ goal, tone }: { goal: number; tone: "above" | "below" }) {
   const above = tone === "above";
-  const line = above ? "bg-white/35" : "bg-navy/35";
-  const text = above ? "text-muted" : "text-navy/70";
-  const goalColor = above ? "text-signal" : "text-navy";
-  const goalLine = above ? "bg-signal" : "bg-navy";
+  const line = above ? "bg-navy/25" : "bg-cellar/35";
+  const text = above ? "text-muted" : "text-cellar/70";
+  const goalColor = above ? "text-gold-ink" : "text-cellar";
+  const goalLine = above ? "bg-champagne-deep" : "bg-cellar";
 
   return (
     <div className="pointer-events-none absolute inset-y-0 right-4 w-16 sm:right-8" aria-hidden>

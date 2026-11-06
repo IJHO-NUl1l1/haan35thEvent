@@ -31,7 +31,7 @@ function readPreview() {
   return Number.isFinite(ratio) ? Math.min(1.5, Math.max(0, ratio)) : null;
 }
 
-// 최종 결과 화면: 참여 인원만큼 화면 아래에서 물이 차오르고, 목표에 닿으면 축하 연출이 나옵니다.
+// 최종 결과 화면: 참여 인원만큼 화면 아래에서 샴페인이 차오르고, 목표에 닿으면 축하 연출이 나옵니다.
 export function ResultView() {
   const { stats, mutate } = useRsvpStats(3000);
   const preview = useSyncExternalStore(subscribeNothing, readPreview, () => null);
@@ -112,7 +112,7 @@ export function ResultView() {
           floaters.list.map((f) => (
             <motion.span
               key={f.id}
-              className="pointer-events-none absolute rounded-full bg-signal px-3 py-1 text-lg font-bold text-navy shadow-sm"
+              className="pointer-events-none absolute rounded-full bg-navy px-3 py-1 text-lg font-bold text-champagne shadow-sm"
               style={{ left: `${f.left}%`, bottom: `${fill * 100}%` }}
               initial={{ opacity: 0, y: 0, scale: 0.8 }}
               animate={{ opacity: [0, 1, 1, 0], y: -140, scale: 1 }}

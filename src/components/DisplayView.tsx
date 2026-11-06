@@ -3,6 +3,7 @@
 import { MOCK_TOOLS_ENABLED } from "@/config/event";
 import { useCelebration } from "@/hooks/useCelebration";
 import { useRsvpStats } from "@/hooks/useRsvpStats";
+import { celebrateDisplay } from "@/lib/celebrate";
 import { EventIntro, EventTitle } from "./EventInfo";
 import { EventQr } from "./EventQr";
 import { MockControls } from "./MockControls";
@@ -15,7 +16,7 @@ const showMockTools = MOCK_TOOLS_ENABLED || process.env.NODE_ENV === "developmen
 // 행사장 스크린/PC 에 띄우는 화면. QR 과 실시간 참여 인원을 보여줍니다.
 export function DisplayView() {
   const { stats, mutate } = useRsvpStats(3000);
-  useCelebration(!!stats && stats.attend >= stats.goal);
+  useCelebration(!!stats && stats.attend >= stats.goal, celebrateDisplay);
 
   return (
     <div className="flex min-h-dvh flex-col">
@@ -36,16 +37,20 @@ export function DisplayView() {
         </section>
 
         <section className="mx-auto w-full max-w-xs sm:max-w-sm lg:mx-0 lg:max-w-[360px] lg:justify-self-end">
-          {/* QR 은 인식률 때문에 흰 바탕 유지 */}
-          <div className="rounded-3xl bg-white p-6 shadow-[0_20px_60px_-20px_rgb(0_0_0/0.45)] sm:p-8">
-            <EventQr />
+          {/* 흰 바탕 위에서 QR 이 묻히지 않게 로고 파랑 액자에 담습니다. QR 자체는 인식률 때문에 흰 바탕 유지 */}
+          <div className="rounded-[28px] bg-primary p-3 shadow-[0_24px_60px_-24px_rgb(13_42_82/0.55)]">
+            <div className="rounded-2xl bg-white p-5 sm:p-6">
+              <EventQr />
+            </div>
+            <div className="px-3 pb-3 pt-5 text-center text-white">
+              <p className="text-lg font-semibold sm:text-xl">휴대폰 카메라로 QR을 비춰 주세요</p>
+              <p className="mt-1 text-sm text-white/75">참여 여부를 바로 알려 주실 수 있어요</p>
+            </div>
           </div>
-          <p className="mt-6 text-center text-lg font-semibold sm:text-xl">휴대폰 카메라로 QR을 비춰 주세요</p>
-          <p className="mt-1 text-center text-sm text-muted">참여 여부를 바로 알려 주실 수 있어요</p>
         </section>
       </main>
 
-      <footer className="border-t border-line bg-deep">
+      <footer className="border-t border-line bg-surface">
         <div className="mx-auto w-full max-w-6xl px-5 py-6 sm:px-8 sm:py-8">
           <ProgressMeter stats={stats} size="lg" />
         </div>
