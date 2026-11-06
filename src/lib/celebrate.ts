@@ -57,7 +57,7 @@ export async function champagnePop() {
 
   // 화면 아래 가로 여러 지점에서 금빛 조각이 분수처럼 솟구칩니다. 두 번 연달아 쏴서 풍성하게.
   // 가운데가 가장 크고 높게, 양옆은 바깥쪽으로 살짝 기울어 넓게 퍼집니다.
-  const fountains = compact ? [0.12, 0.5, 0.88] : [0.08, 0.27, 0.5, 0.73, 0.92];
+  const fountains = compact ? [0.12, 0.5, 0.88] : [0.15, 0.5, 0.85];
   [0, 220].forEach((wait, wave) => {
     setTimeout(() => {
       fountains.forEach((x) => {
