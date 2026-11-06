@@ -48,23 +48,33 @@ export async function celebrateDisplay() {
   })();
 }
 
-// 결과 화면(/result) 목표 달성 시 한 번: 샴페인 코르크가 터지듯 중앙 아래에서 금빛 조각이 솟구치고,
+// 결과 화면(/result) 목표 달성 시 한 번: 샴페인이 터지듯 화면 아래 여러 곳에서 금빛 조각이 솟구치고,
 // 이어서 화면 위쪽 여러 곳에서 금빛 별이 펑펑 터집니다.
 export async function champagnePop() {
   const confetti = await loadConfetti();
   const compact = isCompact();
   const base = { colors: CHAMPAGNE, disableForReducedMotion: true };
 
-  confetti({
-    ...base,
-    particleCount: compact ? 70 : 160,
-    angle: 90,
-    spread: compact ? 40 : 34,
-    startVelocity: compact ? 55 : 85,
-    gravity: 0.9,
-    scalar: compact ? 0.9 : 1.3,
-    shapes: ["circle", "square"],
-    origin: { x: 0.5, y: 1 },
+  // 화면 아래 가로 여러 지점에서 금빛 조각이 분수처럼 솟구칩니다. 두 번 연달아 쏴서 풍성하게.
+  // 가운데가 가장 크고 높게, 양옆은 바깥쪽으로 살짝 기울어 넓게 퍼집니다.
+  const fountains = compact ? [0.12, 0.5, 0.88] : [0.08, 0.27, 0.5, 0.73, 0.92];
+  [0, 220].forEach((wait, wave) => {
+    setTimeout(() => {
+      fountains.forEach((x) => {
+        const center = x === 0.5;
+        confetti({
+          ...base,
+          particleCount: Math.round((compact ? 45 : 90) * (center ? 1.6 : 1) * (wave === 0 ? 1 : 0.7)),
+          angle: 90 + (0.5 - x) * 24,
+          spread: compact ? 38 : 32,
+          startVelocity: (compact ? 55 : 82) * (center ? 1.08 : 1),
+          gravity: 0.9,
+          scalar: compact ? 0.9 : 1.3,
+          shapes: ["circle", "square"],
+          origin: { x, y: 1.02 },
+        });
+      });
+    }, wait);
   });
 
   // 화면 위쪽 여러 지점에서 별이 사방으로 펑펑 터진 뒤 천천히 내려옵니다. (가운데 → 바깥 순서로 번지듯)
