@@ -68,27 +68,30 @@ body {
     linear-gradient(315deg, rgb(255 255 255 / 0.3) 0%, rgb(255 255 255 / 0) 30%);
 }
 
-/* 결과 화면 샴페인 속 은색 글씨: 밝기 차이가 작은 차분한 은색 그라데이션(무광 느낌) +
-   금색 바탕에서 묻히지 않을 만큼만 옅은 그림자. (글자를 투명하게 하고 배경을 글자 모양으로 잘라 냄) */
+/* 결과 화면 샴페인 속 은색 글씨: 가운데에 은은한 금속 띠가 지나는 은색 그라데이션(무광과 크롬의 중간) +
+   금색 바탕에서 또렷하도록 따뜻한 그림자. (글자를 투명하게 하고 배경을 글자 모양으로 잘라 냄) */
 .text-silver {
   background-image: linear-gradient(
     180deg,
-    #f3f4f6 0%,
-    #e3e6ea 55%,
-    #d6dae0 100%
+    #fbfbfc 0%,
+    #eceef1 32%,
+    #cdd2d9 52%,
+    #e5e8ec 68%,
+    #f7f8fa 84%,
+    #d2d7de 100%
   );
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
-  filter: drop-shadow(0 1px 0 rgb(120 84 14 / 0.35)) drop-shadow(0 2px 6px rgb(120 84 14 / 0.18));
+  filter: drop-shadow(0 1px 0 rgb(120 84 14 / 0.45)) drop-shadow(0 3px 7px rgb(120 84 14 / 0.24));
 }
 
 /* 작은 글씨용 은색: 그라데이션은 작으면 뭉개져서 단색 은색 + 옅은 그림자 */
 .text-silver-flat {
-  color: #e4e7eb;
+  color: #e9ecf0;
   text-shadow:
-    0 1px 0 rgb(120 84 14 / 0.45),
-    0 2px 5px rgb(120 84 14 / 0.2);
+    0 1px 0 rgb(120 84 14 / 0.52),
+    0 2px 6px rgb(120 84 14 / 0.28);
 }
 
 /* 리모컨(/remote) 버튼 누름 알림 */
