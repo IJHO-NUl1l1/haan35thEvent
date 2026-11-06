@@ -112,7 +112,7 @@ function Result({ status, onChange }: { status: RsvpStatus; onChange: () => void
   const attending = status === "attend";
   return (
     <div className="text-center">
-      <div className="mx-auto grid size-12 place-items-center rounded-full bg-signal text-navy">
+      <div className="mx-auto grid size-12 place-items-center rounded-full bg-primary text-white">
         <svg viewBox="0 0 24 24" className="size-6" fill="none" stroke="currentColor" strokeWidth={2.5} aria-hidden>
           <path d="M5 12.5l4.5 4.5L19 7.5" strokeLinecap="round" strokeLinejoin="round" />
         </svg>

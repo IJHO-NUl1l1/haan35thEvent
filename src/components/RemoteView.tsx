@@ -106,7 +106,7 @@ export function RemoteView() {
       {/* 현재 인원 */}
       <section className="sticky top-0 z-10 -mx-4 bg-paper px-4 pt-2">
         <div
-          className={`overflow-hidden rounded-2xl bg-navy shadow-lg shadow-navy/25 ring-1 transition-colors ${reached ? "ring-signal" : "ring-navy"}`}
+          className={`overflow-hidden rounded-2xl bg-navy shadow-lg shadow-navy/25 ring-1 transition-colors ${reached ? "ring-champagne" : "ring-navy"}`}
         >
           {/* 심볼 네 가지 색 띠 */}
           <div className="flex h-1" aria-hidden>
@@ -119,7 +119,7 @@ export function RemoteView() {
             <div className="flex items-end justify-between gap-3">
               <div>
                 <p className="text-sm font-semibold text-white/65">{reached ? "목표 달성!" : "함께하기로 한 이웃"}</p>
-                <p className={`mt-1 text-2xl font-bold tabular-nums ${reached ? "text-signal" : "text-brand"}`}>
+                <p className={`mt-1 text-2xl font-bold tabular-nums ${reached ? "text-champagne" : "text-brand"}`}>
                   {stats ? percent : "–"}
                   <span className="text-base">%</span>
                 </p>
@@ -127,7 +127,7 @@ export function RemoteView() {
               <p className="flex items-baseline gap-1 tabular-nums">
                 <span
                   key={attend}
-                  className={`animate-pop inline-block text-6xl font-bold leading-none ${reached ? "text-signal" : "text-white"}`}
+                  className={`animate-pop inline-block text-6xl font-bold leading-none ${reached ? "text-champagne" : "text-white"}`}
                 >
                   {stats ? attend : "–"}
                 </span>
@@ -136,7 +136,7 @@ export function RemoteView() {
             </div>
             <div className="mt-4 h-3 overflow-hidden rounded-full bg-white/10">
               <div
-                className={`h-full rounded-full transition-[width] duration-500 ease-out ${reached ? "bg-signal" : "bg-linear-to-r from-brand to-teal"}`}
+                className={`h-full rounded-full transition-[width] duration-500 ease-out ${reached ? "bg-linear-to-r from-champagne to-champagne-deep" : "bg-linear-to-r from-brand to-primary"}`}
                 style={{ width: `${percent}%` }}
               />
             </div>
@@ -155,7 +155,7 @@ export function RemoteView() {
             <span
               key={noticeKey}
               className={`animate-pop rounded-full px-3 py-1 text-sm font-semibold ${
-                notice.error ? "bg-pink/15 text-pink ring-1 ring-pink/50" : "bg-signal/20 text-signal-ink"
+                notice.error ? "bg-pink/15 text-pink ring-1 ring-pink/50" : "bg-primary/10 text-primary"
               }`}
             >
               {notice.text}
@@ -166,7 +166,7 @@ export function RemoteView() {
 
       {/* 추가 */}
       <section className={card}>
-        <SectionTitle color="bg-signal">인원 추가</SectionTitle>
+        <SectionTitle color="bg-primary">인원 추가</SectionTitle>
         <div className="grid grid-cols-4 gap-2">
           {STEPS.map((n) => (
             <button key={n} className={plus} onClick={() => change(n)}>
@@ -175,7 +175,7 @@ export function RemoteView() {
           ))}
         </div>
         <button
-          className={`${wide} bg-signal text-navy shadow-[0_3px_0_#7fa41f] active:shadow-none`}
+          className={`${wide} bg-champagne text-cellar shadow-[0_3px_0_var(--color-champagne-deep)] active:shadow-none`}
           onClick={fillToGoal}
           disabled={!stats || reached}
         >

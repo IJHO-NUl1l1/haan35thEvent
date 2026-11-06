@@ -3,7 +3,7 @@
 
 /* 색상 토큰. 하안종합사회복지관 Signal Light 로고에서 뽑은 색입니다.
    paper = 흰 바탕, surface = 옅은 파랑 판(카드·하단 띠), ink = 글자(검정 계열), primary = 로고 바탕 파랑(주 버튼),
-   brand = 하늘(심볼), signal = 라임(심볼, 달성/강조. 글자로 쓸 땐 signal-ink) */
+   brand = 하늘(심볼, 진행), champagne = 금색(목표 달성), signal = 라임(로고 색 띠에만 사용) */
 @theme {
   --color-paper: #ffffff;
   --color-surface: #f1f5fb;
@@ -15,7 +15,6 @@
   --color-line-strong: rgb(13 42 82 / 0.22);
   --color-brand: #14a8e2;
   --color-signal: #aed843;
-  --color-signal-ink: #5b8a10;
   --color-pink: #e0267c;
   --color-teal: #11c0b1;
   /* 결과 화면(/result)에서 차오르는 샴페인. 위는 밝은 거품색, 아래로 갈수록 진한 금색 */
