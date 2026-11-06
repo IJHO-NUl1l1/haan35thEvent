@@ -1,13 +1,13 @@
 "use client";
 
 import { motion } from "motion/react";
-import { useEffect, useId } from "react";
+import { useEffect } from "react";
 
 // 새 참여자가 생기면 인스타그램에서 하트를 눌렀을 때처럼 반응이 터집니다. (참여자 한 명 = 한 번)
-// ① 그 자리에 큰 하트(또는 따봉)가 톡 튀어나와(0 → 125% → 100%) 잠깐 머물다 사라지고
+// ① 그 자리에 큰 하트(또는 따봉)가 톡 튀어나와(0 → 120% → 100%) 위로 떠오르며 사라지고
 // ② 동시에 그보다 작고 연한 잔상 몇 개가 같은 자리에서 위로 쇽쇽쇽 떠오릅니다.
 //    잔상마다 출발 시간(살짝 텀), 기울기, 투명도, 올라가는 높이가 조금씩 다릅니다.
-// 시스템 이모지는 기기마다 모양이 다르고(윈도우는 굵은 테두리) 쨍해서, 부드러운 그라데이션 SVG 아이콘을 씁니다.
+// 시스템 이모지는 기기마다 모양이 다르고(윈도우는 굵은 테두리) 쨍해서, 단색 SVG 아이콘을 씁니다.
 export type Reaction = { id: number; order: number };
 
 // 같은 id 는 항상 같은 값을 내는 의사 난수 (렌더 중에 Math.random 을 쓰지 않기 위해)
@@ -16,7 +16,8 @@ function rand(id: number, salt: number) {
   return x - Math.floor(x);
 }
 
-const MAIN_DURATION = 1.5;
+const MAIN_DURATION = 1.6;
+const MAIN_RISE = 150; // px
 
 function shape(id: number, order: number) {
   const ghostCount = 3 + Math.floor(rand(id, 9) * 3); // 잔상 3~5개
@@ -93,25 +94,18 @@ function Burst({ id, order, onDone }: Reaction & { onDone: (id: number) => void 
           <Icon />
         </motion.div>
       ))}
+      {/* 큰 아이콘: 톡 튀어나온 뒤(0 → 120% → 100%) 잔상처럼 위로 떠오르며 사라집니다. */}
       <motion.div
-        className="absolute -translate-x-1/2 -translate-y-1/2 drop-shadow-[0_6px_12px_rgb(13_42_82/0.18)]"
+        className="absolute -translate-x-1/2 -translate-y-1/2"
         style={{ width: `${r.size}vmin`, rotate: r.tilt }}
-        initial={{ opacity: 0, scale: 0 }}
-        animate={{ opacity: [0, 1, 1, 0], scale: [0, 1.25, 0.95, 1, 1, 0.85] }}
+        initial={{ opacity: 0, scale: 0, y: 0 }}
+        animate={{ opacity: [0, 1, 1, 0], scale: [0, 1.2, 1, 1], y: [0, 0, -MAIN_RISE] }}
         transition={{
           duration: MAIN_DURATION,
           delay: r.delay,
-          opacity: {
-            duration: MAIN_DURATION,
-            delay: r.delay,
-            times: [0, 0.08, 0.72, 1],
-          },
-          scale: {
-            duration: MAIN_DURATION,
-            delay: r.delay,
-            times: [0, 0.14, 0.24, 0.32, 0.72, 1],
-            ease: "easeOut",
-          },
+          opacity: { duration: MAIN_DURATION, delay: r.delay, times: [0, 0.08, 0.45, 1] },
+          scale: { duration: MAIN_DURATION, delay: r.delay, times: [0, 0.14, 0.24, 1], ease: "easeOut" },
+          y: { duration: MAIN_DURATION, delay: r.delay, times: [0, 0.24, 1], ease: [0.3, 0.6, 0.4, 1] },
         }}
       >
         <Icon />
@@ -120,42 +114,26 @@ function Burst({ id, order, onDone }: Reaction & { onDone: (id: number) => void 
   );
 }
 
-// 분홍과 빨강 사이의 부드러운 하트. 위쪽이 살짝 밝은 그라데이션 + 옅은 광택.
+// 단색 빨간 하트. 그라데이션·광택 없이 깔끔하게.
 function Heart() {
-  const gid = useId();
   return (
     <svg viewBox="0 0 24 24" className="block h-auto w-full">
-      <defs>
-        <linearGradient id={gid} x1="0.2" y1="0" x2="0.8" y2="1">
-          <stop offset="0" stopColor="#ff8da4" />
-          <stop offset="1" stopColor="#ec4a6e" />
-        </linearGradient>
-      </defs>
       <path
         d="M12 21.2s-7.6-4.5-9.7-9.3C.8 8.3 3 4.4 6.7 4.4c2.1 0 3.6 1.2 5.3 3.2 1.7-2 3.2-3.2 5.3-3.2 3.7 0 5.9 3.9 4.4 7.5-2.1 4.8-9.7 9.3-9.7 9.3z"
-        fill={`url(#${gid})`}
+        fill="#e8283f"
       />
-      <ellipse cx="7.3" cy="8.4" rx="2.1" ry="1.3" fill="#fff" opacity="0.35" transform="rotate(-35 7.3 8.4)" />
     </svg>
   );
 }
 
-// 하트와 어울리는 부드러운 하늘색 따봉. 결과 화면의 파랑(진행) 계열.
+// 단색 파란 따봉. 결과 화면의 파랑(진행) 계열.
 function ThumbsUp() {
-  const gid = useId();
   return (
     <svg viewBox="0 0 24 24" className="block h-auto w-full">
-      <defs>
-        <linearGradient id={gid} x1="0.2" y1="0" x2="0.8" y2="1">
-          <stop offset="0" stopColor="#8fd0f5" />
-          <stop offset="1" stopColor="#3f9bdc" />
-        </linearGradient>
-      </defs>
-      <g fill={`url(#${gid})`} stroke={`url(#${gid})`} strokeWidth="1.2" strokeLinejoin="round">
-        <rect x="2.6" y="10.2" width="4.2" height="10.4" rx="1.4" />
-        <path d="M8.6 10.3 11.7 4.5c.5-.9 1.6-1.2 2.4-.7.9.5 1.2 1.6.8 2.5L13.8 9.1H19c1.4 0 2.4 1.3 2.1 2.6l-1.5 6.9c-.2 1.2-1.3 2.1-2.6 2.1H8.6z" />
+      <g fill="#1e88d6" stroke="#1e88d6" strokeWidth="1" strokeLinejoin="round">
+        <rect x="2.5" y="10.2" width="4" height="10.4" rx="1" />
+        <path d="M8.4 10.3 11.7 4.4c.5-.9 1.6-1.2 2.4-.7.9.5 1.2 1.6.8 2.5L13.8 9.1H19c1.4 0 2.4 1.3 2.1 2.6l-1.5 6.9c-.2 1.2-1.3 2.1-2.6 2.1H8.4z" />
       </g>
-      <ellipse cx="14.6" cy="11.6" rx="2.6" ry="1.1" fill="#fff" opacity="0.3" />
     </svg>
   );
 }
