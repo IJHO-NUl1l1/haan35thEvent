@@ -10,7 +10,6 @@ import { SignalLightLogo } from "./SignalLightLogo";
 // 다른 화면에서는 링크하지 않는 숨겨진 페이지입니다. 누르는 즉시 숫자가 바뀌고, DB 저장은 뒤에서 처리됩니다.
 type RemoteStats = RsvpStats & { manual: number };
 
-
 async function send(init?: RequestInit): Promise<RemoteStats> {
   const res = await fetch("/api/rsvp/remote", { cache: "no-store", ...init });
   if (!res.ok) throw new Error(`/api/rsvp/remote ${res.status}`);
@@ -28,9 +27,6 @@ const shiftManual = (s: RemoteStats, delta: number): RemoteStats => {
 
 export function RemoteView() {
   const [stats, setStats] = useState<RemoteStats | null>(null);
-  const [notice, setNotice] = useState<{ text: string; error?: boolean } | null>(null);
-  // 같은 버튼을 연달아 눌러도 알림이 다시 튀어오르도록 매번 key 를 바꿉니다.
-  const [noticeKey, setNoticeKey] = useState(0);
   const [amount, setAmount] = useState("");
   // useRsvpStats 와 같은 방식: 나중에 누른 동작보다 먼저 출발한 응답은 버립니다.
   const version = useRef(0);
@@ -51,40 +47,52 @@ export function RemoteView() {
     return () => clearInterval(id);
   }, [refresh]);
 
-  const run = async (label: string, optimistic: (s: RemoteStats) => RemoteStats, request: () => Promise<RemoteStats>) => {
+  // 숫자부터 즉시 바꾸고 저장은 뒤에서 합니다. 실패하면 서버 값으로 되돌아가서 숫자가 원래대로 돌아옵니다.
+  const run = async (optimistic: (s: RemoteStats) => RemoteStats, request: () => Promise<RemoteStats>) => {
     const id = ++version.current;
     setStats((s) => s && optimistic(s));
-    setNotice({ text: label });
-    setNoticeKey((k) => k + 1);
     navigator.vibrate?.(15);
     try {
       const result = await request();
       if (version.current === id) setStats(result);
     } catch {
       if (version.current === id) refresh();
-      setNotice({ text: `${label} 반영 실패 — 다시 눌러 주세요`, error: true });
-      setNoticeKey((k) => k + 1);
     }
   };
 
   const change = (delta: number) =>
-    run(`${delta > 0 ? "+" : "−"}${Math.abs(delta)}명`, (s) => shiftManual(s, delta), () => post({ delta }));
+    run(
+      (s) => shiftManual(s, delta),
+      () => post({ delta }),
+    );
 
   const fillToGoal = () =>
-    run("목표 인원까지 채움", (s) => shiftManual(s, Math.max(0, s.goal - s.attend)), () => post({ fillToGoal: true }));
+    run(
+      (s) => shiftManual(s, Math.max(0, s.goal - s.attend)),
+      () => post({ fillToGoal: true }),
+    );
 
   const removeAll = () =>
-    run("직접 추가한 인원 모두 뺌", (s) => shiftManual(s, -s.manual), () => post({ removeAll: true }));
+    run(
+      (s) => shiftManual(s, -s.manual),
+      () => post({ removeAll: true }),
+    );
 
   // 참여 화면(/join)의 응답 버튼 잠금. 휴대폰들은 3초마다 집계를 받아 오면서 이 값을 같이 받아 바로 바뀝니다.
   const toggleLock = () => {
     const next = !stats?.locked;
-    run(next ? "응답 잠금" : "응답 잠금 해제", (s) => ({ ...s, locked: next }), () => post({ locked: next }));
+    run(
+      (s) => ({ ...s, locked: next }),
+      () => post({ locked: next }),
+    );
   };
 
   const reset = () => {
     if (!window.confirm("시민들이 직접 한 응답까지 모두 지워집니다. 정말 초기화할까요?")) return;
-    run("전체 초기화", (s) => ({ ...s, attend: 0, decline: 0, manual: 0 }), () => send({ method: "DELETE" }));
+    run(
+      (s) => ({ ...s, attend: 0, decline: 0, manual: 0 }),
+      () => send({ method: "DELETE" }),
+    );
   };
 
   const typed = Number(amount);
@@ -105,7 +113,8 @@ export function RemoteView() {
     "h-14 rounded-xl bg-primary text-lg font-bold text-white shadow-[0_3px_0_var(--color-navy)] transition-transform active:translate-y-0.5 active:shadow-none disabled:opacity-35";
   const minus =
     "h-14 rounded-xl border border-line-strong bg-paper text-lg font-bold text-ink transition-transform active:scale-95 active:bg-navy/[0.06] disabled:opacity-35";
-  const wide = "h-12 w-full rounded-xl text-base font-semibold active:scale-[0.98] transition-transform disabled:opacity-35";
+  const wide =
+    "h-12 w-full rounded-xl text-base font-semibold active:scale-[0.98] transition-transform disabled:opacity-35";
   const card = "flex flex-col gap-3 rounded-2xl border border-line bg-surface p-3.5";
 
   return (
@@ -115,7 +124,7 @@ export function RemoteView() {
       </header>
 
       {/* 현재 인원 */}
-      <section className="sticky top-0 z-10 -mx-4 bg-paper px-4 pt-2">
+      <section className="sticky top-0 z-10 -mx-4 bg-paper px-4 pb-3 pt-2">
         <div
           className={`overflow-hidden rounded-2xl bg-navy shadow-lg shadow-navy/25 ring-1 transition-colors ${reached ? "ring-champagne" : "ring-navy"}`}
         >
@@ -161,18 +170,6 @@ export function RemoteView() {
             </div>
           </div>
         </div>
-        <div role="status" className="flex h-10 items-center justify-center">
-          {notice && (
-            <span
-              key={noticeKey}
-              className={`animate-pop rounded-full px-3 py-1 text-sm font-semibold ${
-                notice.error ? "bg-pink/15 text-pink ring-1 ring-pink/50" : "bg-primary/10 text-primary"
-              }`}
-            >
-              {notice.text}
-            </span>
-          )}
-        </div>
       </section>
 
       {/* 응답 잠금 */}
@@ -181,9 +178,7 @@ export function RemoteView() {
           <div className="min-w-0">
             <SectionTitle color={locked ? "bg-navy" : "bg-navy/30"}>참여 화면 응답 잠금</SectionTitle>
             <p className="mt-1 pl-3 text-xs text-muted">
-              {locked
-                ? "잠김 — 휴대폰 응답 칸에 잠금 화면이 덮입니다"
-                : "열림 — 휴대폰에서 응답할 수 있습니다"}
+              {locked ? "잠김 — 휴대폰 응답 칸에 잠금 화면이 덮입니다" : "열림 — 휴대폰에서 응답할 수 있습니다"}
             </p>
           </div>
           <button
@@ -232,7 +227,11 @@ export function RemoteView() {
             </button>
           ))}
         </div>
-        <button className={`${wide} border border-line-strong bg-paper text-ink`} onClick={removeAll} disabled={manual === 0}>
+        <button
+          className={`${wide} border border-line-strong bg-paper text-ink`}
+          onClick={removeAll}
+          disabled={manual === 0}
+        >
           직접 추가한 인원 모두 빼기
         </button>
       </section>
@@ -252,7 +251,9 @@ export function RemoteView() {
               onChange={(e) => setAmount(e.target.value)}
               className="h-14 w-full appearance-none rounded-xl [-moz-appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none border border-line-strong bg-paper pl-4 pr-10 text-xl font-bold text-ink tabular-nums placeholder:text-base placeholder:font-normal placeholder:text-muted focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand/40"
             />
-            <span className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-base text-muted">명</span>
+            <span className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-base text-muted">
+              명
+            </span>
           </label>
           <button className={`${plus} px-5`} onClick={() => changeTyped(1)} disabled={!typedValid}>
             추가
