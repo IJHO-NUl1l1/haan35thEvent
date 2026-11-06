@@ -4,9 +4,11 @@ import { motion } from "motion/react";
 import { useEffect } from "react";
 
 // 새 참여자가 생기면 인스타그램에서 하트를 눌렀을 때처럼 반응이 터집니다. (참여자 한 명 = 한 번)
-// ① 그 자리에 큰 하트(또는 따봉)가 톡 튀어나와(0 → 120% → 100%) 위로 떠오르며 사라지고
-// ② 동시에 그보다 작고 연한 잔상 몇 개가 같은 자리에서 위로 쇽쇽쇽 떠오릅니다.
-//    잔상마다 출발 시간(살짝 텀), 기울기, 투명도, 올라가는 높이가 조금씩 다릅니다.
+// ① 큰 하트(또는 따봉)가 톡 튀어나와(0 → 120% → 100%) 살짝 흔들리며 위로 떠오르다 사라지고
+// ② 그 큰 아이콘에서 작고 연한 잔상들이 쇽쇽쇽 뿜어져 나옵니다.
+// 잔상은 화면 기준 위치가 아니라 "움직이는 큰 아이콘" 안에 붙어 있어서, 매번 위치를 계산하지 않아도
+// 그 순간 큰 아이콘이 있는 자리에서 나오고 큰 아이콘을 따라가며 퍼집니다. (기준점 = 큰 아이콘)
+// 잔상마다 출발 시간(살짝 텀), 기울기, 투명도, 퍼지는 거리가 조금씩 다릅니다.
 // 시스템 이모지는 기기마다 모양이 다르고(윈도우는 굵은 테두리) 쨍해서, 단색 SVG 아이콘을 씁니다.
 export type Reaction = { id: number; order: number };
 
@@ -16,8 +18,9 @@ function rand(id: number, salt: number) {
   return x - Math.floor(x);
 }
 
-const MAIN_DURATION = 1.6;
-const MAIN_RISE = 150; // px
+const MAIN_DURATION = 1.6; // 큰 아이콘이 보이는 시간
+const POP = 0.38; // 톡 튀어나오는 동안은 제자리
+const MAIN_RISE = 150; // 큰 아이콘이 사라질 때까지 올라가는 거리(px)
 
 function shape(id: number, order: number) {
   const ghostCount = 3 + Math.floor(rand(id, 9) * 3); // 잔상 3~5개
@@ -25,7 +28,7 @@ function shape(id: number, order: number) {
     delay: 0.12 + i * (0.11 + rand(id, 20 + i) * 0.07), // 쇽, 쇽, 쇽 — 간격도 조금씩 다르게
     angle: (rand(id, 30 + i) - 0.5) * 44, // -22° ~ 22°
     opacity: 0.5 + rand(id, 40 + i) * 0.35, // 0.5 ~ 0.85
-    rise: 90 + rand(id, 50 + i) * 110, // 90 ~ 200px
+    rise: 50 + rand(id, 50 + i) * 80, // 큰 아이콘 기준 50 ~ 130px 더 위로
     drift: (rand(id, 60 + i) - 0.5) * 60,
     scale: 0.55 + rand(id, 70 + i) * 0.25,
     duration: 1.1 + rand(id, 80 + i) * 0.4,
@@ -37,6 +40,7 @@ function shape(id: number, order: number) {
     top: 22 + rand(id, 2) * 62, // 화면 세로 22~84%
     size: 5.4 + rand(id, 3) * 3, // 5.4~8.4vmin
     tilt: (rand(id, 4) - 0.5) * 16,
+    sway: (12 + rand(id, 6) * 22) * (rand(id, 8) > 0.5 ? 1 : -1), // 큰 아이콘 좌우 흔들림
     delay: order * 0.16 + rand(id, 5) * 0.1, // 한 번에 여러 명이면 여기저기서 차례로
     ghosts,
     end,
@@ -64,51 +68,62 @@ function Burst({ id, order, onDone }: Reaction & { onDone: (id: number) => void 
     return () => clearTimeout(timer);
   }, [id, total, onDone]);
 
+  // 기준점(큰 아이콘)은 톡 튀어나오는 동안 제자리에 있다가 같은 속도로 계속 올라갑니다.
+  // 큰 아이콘이 사라진 뒤에도 남은 잔상이 따라갈 수 있게 마지막 잔상이 끝날 때까지 움직입니다.
+  const anchorRise = (MAIN_RISE * (r.end - POP)) / (MAIN_DURATION - POP);
+  const popAt = POP / r.end;
+
   return (
-    // 크기 0 인 기준점. 큰 아이콘과 잔상이 모두 여기서 출발합니다.
     <div className="absolute" style={{ left: `${r.left}%`, top: `${r.top}%` }}>
-      {r.ghosts.map((g, i) => (
-        <motion.div
-          key={i}
-          className="absolute -translate-x-1/2 -translate-y-1/2"
-          style={{ width: `${r.size}vmin` }}
-          initial={{ opacity: 0, scale: g.scale * 0.6, y: 0, x: 0, rotate: 0 }}
-          animate={{
-            opacity: [0, g.opacity, g.opacity, 0],
-            scale: g.scale,
-            y: -g.rise,
-            x: g.drift,
-            rotate: g.angle,
-          }}
-          transition={{
-            duration: g.duration,
-            delay: r.delay + g.delay,
-            ease: [0.25, 0.7, 0.4, 1],
-            opacity: {
+      <motion.div
+        className="absolute"
+        initial={{ y: 0, x: 0 }}
+        animate={{ y: [0, 0, -anchorRise], x: [0, 0, r.sway, -r.sway * 0.5] }}
+        transition={{
+          delay: r.delay,
+          y: { duration: r.end, delay: r.delay, times: [0, popAt, 1], ease: "linear" },
+          x: { duration: r.end, delay: r.delay, times: [0, popAt, 0.6, 1], ease: "easeInOut" },
+        }}
+      >
+        {/* 잔상: 기준점(큰 아이콘 자리)에서 나와 기준점보다 조금 더 위로 퍼집니다. 큰 아이콘 뒤에 그려집니다. */}
+        {r.ghosts.map((g, i) => (
+          <motion.div
+            key={i}
+            className="absolute -translate-x-1/2 -translate-y-1/2"
+            style={{ width: `${r.size}vmin` }}
+            initial={{ opacity: 0, scale: g.scale * 0.6, y: 0, x: 0, rotate: 0 }}
+            animate={{
+              opacity: [0, g.opacity, g.opacity, 0],
+              scale: g.scale,
+              y: -g.rise,
+              x: g.drift,
+              rotate: g.angle,
+            }}
+            transition={{
               duration: g.duration,
               delay: r.delay + g.delay,
-              times: [0, 0.15, 0.55, 1],
-            },
+              ease: [0.25, 0.7, 0.4, 1],
+              opacity: { duration: g.duration, delay: r.delay + g.delay, times: [0, 0.15, 0.55, 1] },
+            }}
+          >
+            <Icon />
+          </motion.div>
+        ))}
+        {/* 큰 아이콘: 기준점과 함께 움직이고, 스스로는 크기·투명도만 바뀝니다. */}
+        <motion.div
+          className="absolute -translate-x-1/2 -translate-y-1/2"
+          style={{ width: `${r.size}vmin`, rotate: r.tilt }}
+          initial={{ opacity: 0, scale: 0 }}
+          animate={{ opacity: [0, 1, 1, 0], scale: [0, 1.2, 1, 1] }}
+          transition={{
+            duration: MAIN_DURATION,
+            delay: r.delay,
+            opacity: { duration: MAIN_DURATION, delay: r.delay, times: [0, 0.08, 0.5, 1] },
+            scale: { duration: MAIN_DURATION, delay: r.delay, times: [0, 0.14, 0.24, 1], ease: "easeOut" },
           }}
         >
           <Icon />
         </motion.div>
-      ))}
-      {/* 큰 아이콘: 톡 튀어나온 뒤(0 → 120% → 100%) 잔상처럼 위로 떠오르며 사라집니다. */}
-      <motion.div
-        className="absolute -translate-x-1/2 -translate-y-1/2"
-        style={{ width: `${r.size}vmin`, rotate: r.tilt }}
-        initial={{ opacity: 0, scale: 0, y: 0 }}
-        animate={{ opacity: [0, 1, 1, 0], scale: [0, 1.2, 1, 1], y: [0, 0, -MAIN_RISE] }}
-        transition={{
-          duration: MAIN_DURATION,
-          delay: r.delay,
-          opacity: { duration: MAIN_DURATION, delay: r.delay, times: [0, 0.08, 0.45, 1] },
-          scale: { duration: MAIN_DURATION, delay: r.delay, times: [0, 0.14, 0.24, 1], ease: "easeOut" },
-          y: { duration: MAIN_DURATION, delay: r.delay, times: [0, 0.24, 1], ease: [0.3, 0.6, 0.4, 1] },
-        }}
-      >
-        <Icon />
       </motion.div>
     </div>
   );
