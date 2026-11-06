@@ -15,11 +15,12 @@ import { SiteHeader } from "./SiteHeader";
 const showMockTools = MOCK_TOOLS_ENABLED || process.env.NODE_ENV === "development";
 
 // QR 을 찍고 들어오는 모바일 화면. 참여/불참 응답 → 결과 화면.
-export function JoinView() {
+// initialLocked: 서버가 페이지를 그릴 때 읽어 둔 잠금 여부. 첫 집계가 오기 전까지 이 값으로 그립니다.
+export function JoinView({ initialLocked = false }: { initialLocked?: boolean }) {
   const myStatus = useSyncExternalStore(subscribeMyStatus, getMyStatus, () => null);
   // 3초마다 집계를 다시 불러옵니다. 리모컨의 응답 잠금(stats.locked)도 이 값에 실려 와서 새로고침 없이 반영됩니다.
   const { stats, mutate } = useRsvpStats(3000);
-  const locked = !!stats?.locked;
+  const locked = stats ? stats.locked : initialLocked;
   // "응답 바꾸기"를 눌러 버튼을 다시 보고 있는 상태. 기존 응답(myStatus)은 그대로 둡니다.
   const [editing, setEditing] = useState(false);
   const [failed, setFailed] = useState(false);
