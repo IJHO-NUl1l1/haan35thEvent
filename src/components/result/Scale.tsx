@@ -1,17 +1,10 @@
 // 오른쪽 눈금자. 목표 인원과 그 아래 깔끔한 숫자(예: 목표 250 → 50 / 100 / 150 / 200) 지점에 인원수를 표시합니다.
 // 간격은 목표에서 자동으로 정합니다. 목표를 바꿔도 따로 고칠 필요가 없습니다.
-
-// 목표를 대략 4칸으로 나눴을 때 가장 가까운 깔끔한 간격 (1, 2, 2.5, 5 × 10ⁿ)
-function niceStep(goal: number) {
-  const raw = goal / 4;
-  const magnitude = 10 ** Math.floor(Math.log10(raw));
-  const candidates = [1, 2, 2.5, 5, 10].map((m) => m * magnitude).filter(Number.isInteger);
-  return candidates.reduce((best, c) => (Math.abs(c - raw) < Math.abs(best - raw) ? c : best), candidates[0] ?? 1);
-}
+import { niceNumber } from "@/lib/steps";
 
 // 목표 바로 아래 눈금이 목표와 너무 붙으면(간격의 40% 미만) 빼서 글씨가 겹치지 않게 합니다.
 function marksFor(goal: number) {
-  const step = niceStep(goal);
+  const step = niceNumber(goal / 4); // 대략 4칸
   const marks: number[] = [];
   for (let value = step; value <= goal - step * 0.4; value += step) marks.push(value);
   return marks;

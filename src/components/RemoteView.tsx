@@ -1,14 +1,15 @@
 "use client";
 
 import { type ReactNode, useCallback, useEffect, useRef, useState } from "react";
+import { EVENT } from "@/config/event";
 import type { RsvpStats } from "@/lib/rsvp";
+import { quickSteps } from "@/lib/steps";
 import { SignalLightLogo } from "./SignalLightLogo";
 
 // 운영자 리모컨: 휴대폰 조작이 어려운 분들 대신 스태프가 참여 인원을 직접 올리고 내립니다.
 // 다른 화면에서는 링크하지 않는 숨겨진 페이지입니다. 누르는 즉시 숫자가 바뀌고, DB 저장은 뒤에서 처리됩니다.
 type RemoteStats = RsvpStats & { manual: number };
 
-const STEPS = [1, 5, 10, 20];
 
 async function send(init?: RequestInit): Promise<RemoteStats> {
   const res = await fetch("/api/rsvp/remote", { cache: "no-store", ...init });
@@ -91,7 +92,10 @@ export function RemoteView() {
   const changeTyped = (sign: 1 | -1) => typedValid && change(sign * typed);
 
   const attend = stats?.attend ?? 0;
-  const goal = stats?.goal ?? 1;
+  const goal = stats?.goal ?? EVENT.goal.value;
+  // ±버튼 단위는 목표 인원에 맞춰 자동으로 정합니다. (lib/steps.ts)
+  const steps = quickSteps(goal);
+  const stepGrid = { gridTemplateColumns: `repeat(${steps.length}, minmax(0, 1fr))` };
   const manual = stats?.manual ?? 0;
   const locked = !!stats?.locked;
   const reached = !!stats && attend >= goal;
@@ -200,8 +204,8 @@ export function RemoteView() {
       {/* 추가 */}
       <section className={card}>
         <SectionTitle color="bg-primary">인원 추가</SectionTitle>
-        <div className="grid grid-cols-4 gap-2">
-          {STEPS.map((n) => (
+        <div className="grid gap-2" style={stepGrid}>
+          {steps.map((n) => (
             <button key={n} className={plus} onClick={() => change(n)}>
               +{n}
             </button>
@@ -221,8 +225,8 @@ export function RemoteView() {
         <SectionTitle color="bg-navy/30" note="직접 추가한 인원에서만 빠집니다">
           인원 빼기
         </SectionTitle>
-        <div className="grid grid-cols-4 gap-2">
-          {STEPS.map((n) => (
+        <div className="grid gap-2" style={stepGrid}>
+          {steps.map((n) => (
             <button key={n} className={minus} onClick={() => change(-n)} disabled={manual === 0}>
               −{n}
             </button>

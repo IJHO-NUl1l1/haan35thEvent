@@ -1,7 +1,9 @@
 "use client";
 
 import type { MutateStats } from "@/hooks/useRsvpStats";
+import { EVENT } from "@/config/event";
 import type { RsvpStats } from "@/lib/rsvp";
+import { mockStep } from "@/lib/steps";
 import { MockBadge } from "./MockBadge";
 
 async function send(init: RequestInit): Promise<RsvpStats> {
@@ -32,13 +34,16 @@ export function MockControls({
   const reset = () =>
     mutate((s) => ({ ...s, attend: 0, decline: 0 }), () => send({ method: "DELETE" })).catch(() => {});
 
+  // 큰 단위는 목표 인원에 맞춰 자동으로 정합니다. (목표 100 → +10, 250 → +25)
+  const bigStep = mockStep(EVENT.goal.value);
+
   const button =
     "rounded-md border border-amber-200 bg-white px-2.5 py-1.5 text-xs font-medium text-navy hover:bg-amber-50";
   return (
     <div className={`${className} flex flex-wrap items-center justify-center gap-2 rounded-lg border border-amber-300 bg-amber-50/95 p-2 shadow-sm`}>
       <MockBadge label="MOCK 테스트" />
       <button className={button} onClick={() => addAttendees(1)}>+1 참여</button>
-      <button className={button} onClick={() => addAttendees(10)}>+10 참여</button>
+      <button className={button} onClick={() => addAttendees(bigStep)}>+{bigStep} 참여</button>
       <button className={button} onClick={fillToGoal}>목표 달성</button>
       <button className={button} onClick={reset}>초기화</button>
     </div>
