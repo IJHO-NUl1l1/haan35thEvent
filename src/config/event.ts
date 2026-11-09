@@ -24,5 +24,5 @@ export const EVENT = {
   },
   // 목표 인원. 이 숫자 하나만 바꾸면 모든 화면(진행 바, 결과 화면 물높이·눈금·문구, 리모컨, 목표 달성 버튼,
   // 축하 이펙트 시점)에 그대로 반영됩니다. 다른 파일에는 목표 숫자를 따로 적지 않습니다.
-  goal: { mock: false, value: 250 },
+  goal: { mock: false, value: 300 },
 } as const;
