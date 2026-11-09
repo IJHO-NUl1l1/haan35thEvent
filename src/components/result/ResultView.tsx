@@ -9,15 +9,13 @@ import {
   useTransform,
 } from "motion/react";
 import { useCallback, useEffect, useState, useSyncExternalStore } from "react";
-import { EVENT, MOCK_TOOLS_ENABLED } from "@/config/event";
+import { EVENT } from "@/config/event";
 import { useRsvpStats } from "@/hooks/useRsvpStats";
-import { MockControls } from "../MockControls";
 import { Finale } from "./Finale";
 import { LiquidFill } from "./LiquidFill";
 import { type Reaction, Reactions } from "./Reactions";
 import { ResultContent } from "./ResultContent";
 
-const showMockTools = MOCK_TOOLS_ENABLED || process.env.NODE_ENV === "development";
 // 0명이어도 수면(물결)이 보이도록 최소 높이를 둡니다.
 const MIN_LEVEL = 0.04;
 // 인원이 늘 때 한 번에 터뜨리는 반응 수 / 화면에 동시에 떠 있는 최대 수
@@ -36,7 +34,7 @@ function readPreview() {
 
 // 최종 결과 화면: 참여 인원만큼 화면 아래에서 샴페인이 차오르고, 목표에 닿으면 축하 연출이 나옵니다.
 export function ResultView() {
-  const { stats, mutate } = useRsvpStats(3000);
+  const { stats } = useRsvpStats(3000);
   const preview = useSyncExternalStore(subscribeNothing, readPreview, () => null);
   const reduceMotion = useReducedMotion();
 
@@ -117,7 +115,6 @@ export function ResultView() {
 
       {reached && !reduceMotion && <Finale />}
 
-      {showMockTools && preview === null && <MockControls mutate={mutate} className="fixed left-1/2 top-3 z-20 -translate-x-1/2" />}
     </div>
   );
 }

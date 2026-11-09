@@ -1,4 +1,4 @@
-// 운영자 리모컨(/remote) 전용. 행사 중에도 써야 하므로 MOCK_TOOLS_ENABLED 와 상관없이 동작합니다.
+// 운영자 리모컨(/remote) 전용 API. 인원 추가·빼기, 목표까지 채우기, 응답 잠금, 전체 초기화.
 import { connection } from "next/server";
 import {
   addMockAttendees,

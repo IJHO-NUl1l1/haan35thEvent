@@ -12,8 +12,3 @@ export function niceNumber(x: number) {
 export function quickSteps(goal: number) {
   return [...new Set([1, 5, niceNumber(goal / 10), niceNumber(goal / 5)])].sort((a, b) => a - b);
 }
-
-// MOCK 테스트의 큰 단위 (+1 옆 버튼). 목표의 약 1/10. 예) 목표 100 → 10, 250 → 25
-export function mockStep(goal: number) {
-  return Math.max(2, niceNumber(goal / 10));
-}

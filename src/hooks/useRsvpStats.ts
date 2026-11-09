@@ -46,5 +46,3 @@ export function useRsvpStats(intervalMs: number) {
 
   return { stats, refresh, mutate };
 }
-
-export type MutateStats = ReturnType<typeof useRsvpStats>["mutate"];

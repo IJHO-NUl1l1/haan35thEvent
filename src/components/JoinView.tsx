@@ -1,18 +1,14 @@
 "use client";
 
 import { useEffect, useRef, useState, useSyncExternalStore } from "react";
-import { MOCK_TOOLS_ENABLED } from "@/config/event";
 import { useCelebration } from "@/hooks/useCelebration";
 import { useRsvpStats } from "@/hooks/useRsvpStats";
 import { smallBurst } from "@/lib/celebrate";
 import { getLocalVoterId, getMyStatus, setLocalVoterId, setMyStatus, subscribeMyStatus } from "@/lib/my-response";
 import { fetchMyResponse, shiftStats, submitResponse, type RsvpStatus } from "@/lib/rsvp";
 import { EventIntro, EventTitle } from "./EventInfo";
-import { MockControls } from "./MockControls";
 import { ProgressMeter } from "./ProgressMeter";
 import { SiteHeader } from "./SiteHeader";
-
-const showMockTools = MOCK_TOOLS_ENABLED || process.env.NODE_ENV === "development";
 
 // QR 을 찍고 들어오는 모바일 화면. 참여/불참 응답 → 결과 화면.
 // initialLocked: 서버가 페이지를 그릴 때 읽어 둔 잠금 여부. 첫 집계가 오기 전까지 이 값으로 그립니다.
@@ -140,9 +136,6 @@ export function JoinView({ initialLocked = false }: { initialLocked?: boolean })
           <ProgressMeter stats={stats} />
         </div>
       </section>
-
-      {/* 모바일에서는 고정 위치가 로고·버튼을 가려서 본문 아래에 둡니다. */}
-      {showMockTools && <MockControls mutate={mutate} className="mx-auto mt-6" />}
     </main>
   );
 }

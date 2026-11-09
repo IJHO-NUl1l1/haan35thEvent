@@ -94,10 +94,10 @@ export async function saveResponse(voterId: string, status: RsvpStatus) {
   mockResponses.set(voterId, status);
 }
 
-// MOCK 테스트·리모컨으로 직접 넣은 참여자는 voter_id 가 이 접두어로 시작합니다. (실제 응답과 구분)
+// 리모컨으로 직접 넣은 참여자는 voter_id 가 이 접두어로 시작합니다. (실제 응답과 구분)
 const MANUAL_PREFIX = "mock-";
 
-// MOCK 테스트용 가짜 참여자. 여러 명도 DB 요청 한 번으로 넣습니다.
+// 리모컨으로 직접 넣는 참여자. 여러 명도 DB 요청 한 번으로 넣습니다.
 export async function addMockAttendees(count: number) {
   const ids = Array.from({ length: count }, () => `${MANUAL_PREFIX}${crypto.randomUUID()}`);
   if (supabase) {

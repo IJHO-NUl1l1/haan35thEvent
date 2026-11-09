@@ -1,21 +1,17 @@
 "use client";
 
-import { MOCK_TOOLS_ENABLED } from "@/config/event";
 import { useCelebration } from "@/hooks/useCelebration";
 import { useRsvpStats } from "@/hooks/useRsvpStats";
 import { celebrateDisplay } from "@/lib/celebrate";
 import { EventIntro, EventTitle } from "./EventInfo";
 import { EventQr } from "./EventQr";
-import { MockControls } from "./MockControls";
 import { ProgressMeter } from "./ProgressMeter";
 import { SignalLightLogo } from "./SignalLightLogo";
 import { SiteHeader } from "./SiteHeader";
 
-const showMockTools = MOCK_TOOLS_ENABLED || process.env.NODE_ENV === "development";
-
 // 행사장 스크린/PC 에 띄우는 화면. QR 과 실시간 참여 인원을 보여줍니다.
 export function DisplayView() {
-  const { stats, mutate } = useRsvpStats(3000);
+  const { stats } = useRsvpStats(3000);
   useCelebration(!!stats && stats.attend >= stats.goal, celebrateDisplay);
 
   return (
@@ -56,7 +52,6 @@ export function DisplayView() {
         </div>
       </footer>
 
-      {showMockTools && <MockControls mutate={mutate} className="fixed left-1/2 top-3 z-20 -translate-x-1/2" />}
     </div>
   );
 }
